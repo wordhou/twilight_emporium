@@ -1,5 +1,5 @@
 import Tiles from "../editor/tiles";
-import { State } from "../lib/chain";
+import { State, CorruptedStateError } from "../lib/chain";
 import {
   Tile
   TileIndex,
@@ -36,7 +36,7 @@ class TwilightMap implements TwilightMapState {
     if (!Number.isSafeInteger(r))
       return new Error("Number of rings must be an integer value");
     if (r < 1 || r >= SPACES.length)
-      return new RangeError("Number of rings out of range");
+      return new RangeError(`Number of rings can't be greater than ${MAX_RINGS}`);
     if (r === this.rings) return;
     if (r < this.rings) this.board = this.board.slice(0, SPACES[r]); // Shrink the board
     if (r > this.rings) {
@@ -61,9 +61,21 @@ class TwilightMap implements TwilightMapState {
    * Swaps the tiles at two indices
    */
   swapTiles(i: TileIndex, j: TileIndex): Result<void> {
+    if (i >= this.board.length || j >= this.board.length)
+      return new RangeError(`Tile indices ${i}, ${j} out of range`);
     const temp = this.board[i];
     this.board[i] = this.board[j];
     this.board[j] = temp;
+  }
+
+  /**
+   * Swaps multiple pairs of tiles
+   */
+  swapManyTiles(pairs: [TileIndex, TileIndex][]): Result<void> {
+    for (const p of pairs) {
+      const err = this.swapTiles(...p);
+      if (err instanceof Error) return new CorruptedStateError("Tile index out of range");
+    }
   }
 
   /**
@@ -78,7 +90,10 @@ class TwilightMap implements TwilightMapState {
    * Sets a number of tiles on the board at once.
    */
   setTiles(sec: MapSection): Result<void> {
-    sec.forEach((t, i) => this.setTile(t, i));
+    for (const [t,i] of sec.entries()) {
+      const err = this.setTile(t, i);
+      if (err instanceof Error) return new CorruptedStateError('Tile index out of range');
+    }
   }
 
   /**
@@ -96,8 +111,7 @@ class TwilightMap implements TwilightMapState {
   getMapSection(sel: TileSelection): Result<MapSection> {
     const sec: MapSection = new Map<TileIndex, Tile>();
     for (const i of sel) {
-      if (i >= this.board.length)
-        return new RangeError("Selection index out of range");
+      if (i >= this.board.length) return new RangeError("Selection index out of range");
       sec.set(i, this.board[i]);
     }
     return sec;

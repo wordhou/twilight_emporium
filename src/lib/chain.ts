@@ -6,13 +6,30 @@ interface State<S> {
   clone: () => State<S>;
 }
 
+class InvalidEditError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+class CorruptedStateError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+/**
+ * Describes an object that has a forward
+ */
 interface Edit<S> {
-  forward: (st: State<S>) => void;
+  forward: (st: State<S>) => void | Error;
 }
 
 interface ReversibleEdit<S> extends Edit<S> {
   reversible: boolean;
-  backward: (st: State<S>) => void;
+  backward: (st: State<S>) => void | Error;
 }
 
 function isReversibleEdit<S>(ed: Edit<S>): ed is ReversibleEdit<S> {
@@ -96,4 +113,11 @@ class EditChain<S> implements IEditChain<S> {
   }
 }
 
-export { State, Edit, ReversibleEdit, EditChain };
+export {
+  State,
+  Edit,
+  ReversibleEdit,
+  EditChain,
+  InvalidEditError,
+  CorruptedStateError,
+};
