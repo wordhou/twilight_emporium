@@ -8,16 +8,17 @@ const NEG_ONE = 0b1111111;
 function newTile(n: number, r?: rotation, f?: face): Tile {
   const fb = f === "A" ? 1 : f === "B" ? 2 : 0;
   const rb = r === undefined ? 6 : r;
-  const nb = n ? 0 : n === -1 ? NEG_ONE : n;
-  return (nb << 5) | (rb << 3) | fb;
+  const nb = n === -1 ? NEG_ONE : n;
+  return (nb << 5) | (rb << 2) | fb;
 }
 
 function fromTTSString(s: string): Result<Tile> {
-  const re = /^(-?\d+)(A|B)?(?:-([0-5]))?$/g.exec(s);
+  const re = /(-?\d+)(A|B)?(?:-([0-5]))?/.exec(s);
   if (re === null) return Error("Invalid TTS string");
   const n = parseInt(re[1]);
-  const r = re[2] === undefined ? undefined : (parseInt(re[2]) as rotation);
-  return newTile(n, r, re[3] as face);
+  const r = re[3] === undefined ? undefined : (parseInt(re[3]) as rotation);
+  const f = re[2] as face;
+  return newTile(n, r, f);
 }
 
 /**
@@ -28,16 +29,16 @@ function fromTTSString(s: string): Result<Tile> {
  * 83-92 are hyperlane tiles, and need an A or a B to indicate which face is up, and a rotation.
  */
 function toTTSString(t: Tile): string {
-  const f = getFace(t);
-  const r = getRotation(t);
   const n = getNumber(t);
+  const r = getRotation(t);
+  const f = getFace(t);
   if (n === NEG_ONE) return "-1";
-  return `${n}${f ? f : ""}${r ? `-${r}` : ""}`;
+  return `${n}${f !== undefined ? f : ""}${r !== undefined ? `-${r}` : ""}`;
 }
 
-function getFace(t: Tile): face {
-  const f = t & 0b11;
-  return f === 1 ? "A" : f === 2 ? "B" : undefined;
+function getNumber(t: Tile): number {
+  const n = (t >> 5) & 0b1111111;
+  return n === 127 ? -1 : n;
 }
 
 function getRotation(t: Tile): rotation {
@@ -45,15 +46,13 @@ function getRotation(t: Tile): rotation {
   return rb > 5 ? undefined : (rb as rotation);
 }
 
-function getNumber(t: Tile): number {
-  //return (b => b === 127 ? -1 : b)(t >> 5);
-  return t >> 5;
+function getFace(t: Tile): face {
+  const f = t & 0b11;
+  return f === 1 ? "A" : f === 2 ? "B" : undefined;
 }
 
-function rotate(t: Tile, r: number): Tile {
-  const orientation = ((b) => (b > 5 ? 0 : b))(t & 0b11100);
-  const bits = (orientation + r) % 6;
-  return (t & ~0b11100) | (bits << 2);
+function setNumber(t: Tile, num: number): Tile {
+  return (t & 0b11111) | (num << 5);
 }
 
 function setRotation(t: Tile, r: rotation): Tile {
@@ -67,8 +66,14 @@ function setFace(t: Tile, f: face): Tile {
   return t & ~0b11;
 }
 
-function setNumber(t: Tile, num: number): Tile {
-  return (t & 0b11111) | (num << 5);
+function mod(n: number, m: number) {
+  return ((n % m) + m) % m;
+}
+
+function rotate(t: Tile, r: number): Tile {
+  const orientation = ((b) => (b > 5 ? 0 : b))((t & 0b11100) >> 2);
+  const bits = mod(orientation + r, 6);
+  return (t & ~0b11100) | (bits << 2);
 }
 
 export default {

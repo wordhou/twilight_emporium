@@ -18,7 +18,7 @@ const newTileParams: [number, rotation, face][] = [
   [88, undefined, "B"],
 ];
 
-const TTSStrings = ["5", "5-4", "83A-0", "83A-4", "-1", "88B"];
+const TTSStrings = ["5", "5-4", "83A-0", "84B-4", "-1", "88B"];
 
 describe("getNumber", () => {
   test("gets number", () => {
@@ -99,5 +99,22 @@ describe("fromTTSString", () => {
 });
 
 describe("rotate", () => {
-  test("changes the rotation of a tile", () => {});
+  const rs = [-1, 0, 1, 10];
+  const rotated = [
+    [5, 0, 1, 4],
+    [3, 4, 5, 2],
+    [5, 0, 1, 4],
+    [3, 4, 5, 2],
+    [5, 0, 1, 4],
+    [5, 0, 1, 4],
+  ];
+  test("changes the rotation of a tile", () => {
+    const rotated_ = newTileParams
+      .map((params) => Tiles.newTile(...params))
+      .map((t) =>
+        rs.map((r) => Tiles.rotate(t, r)).map((t_) => Tiles.getRotation(t_))
+      );
+
+    expect(rotated_).toStrictEqual(rotated);
+  });
 });
