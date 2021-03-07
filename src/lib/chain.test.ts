@@ -169,3 +169,31 @@ test("Undo followed by redos doesn't change state", () => {
   eh.redo();
   expect(eh.current.x[0]).toEqual(56);
 });
+
+test("Undo multiple steps at once", () => {
+  const eh = new EditHistory(new Num(5));
+  edits.forEach((ed) => eh.add(ed));
+  expect(eh.undo(7)).toBeUndefined();
+  expect(eh.current.x[0]).toEqual(5);
+});
+
+test("Too many undos throws error", () => {
+  const eh = new EditHistory(new Num(5));
+  edits.forEach((ed) => eh.add(ed));
+  expect(eh.undo(8)).toBeInstanceOf(Error);
+});
+
+test("Redo multiple steps at once", () => {
+  const eh = new EditHistory(new Num(5));
+  edits.forEach((ed) => eh.add(ed));
+  expect(eh.undo(7)).toBeUndefined();
+  expect(eh.redo(7)).toBeUndefined();
+  expect(eh.current.x[0]).toEqual(56);
+});
+
+test("Too many redos throws error", () => {
+  const eh = new EditHistory(new Num(5));
+  edits.forEach((ed) => eh.add(ed));
+  expect(eh.undo(7)).toBeUndefined();
+  expect(eh.redo(8)).toBeInstanceOf(Error);
+});
