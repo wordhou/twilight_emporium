@@ -1,4 +1,4 @@
-import { State, Edit, ReversibleEdit } from "./lib/chain";
+//import { State, Edit, ReversibleEdit } from "./lib/chain";
 
 type Result<T> = T | Error;
 
@@ -19,20 +19,6 @@ type MapSection = Map<TileIndex, Tile>;
  * increase going clockwise around the ring.
  */
 type TileIndex = number;
-type TwilightMapState = State<"TwilightMap">;
-type TwilightMapEdit = Edit<"TwilightMap">;
-type ReversibleTwilightMapEdit = ReversibleEdit<"TwilightMap">;
 type TileSelection = Set<TileIndex>;
 
-export {
-  Result,
-  rotation,
-  face,
-  Tile,
-  TileIndex,
-  TwilightMapState,
-  TwilightMapEdit,
-  ReversibleTwilightMapEdit,
-  TileSelection,
-  MapSection,
-};
+export { Result, rotation, face, Tile, TileIndex, TileSelection, MapSection };

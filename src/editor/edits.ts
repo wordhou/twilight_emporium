@@ -1,120 +1,133 @@
-import { CorruptedStateError, InvalidEditError } from "../lib/chain";
-import { TwilightMap } from "../editor/twilightmap";
 import {
-  Result,
-  TwilightMapState,
-  TwilightMapEdit,
-  TileIndex,
-  Tile,
-  ReversibleTwilightMapEdit,
-  MapSection,
-} from "../types";
+  State,
+  Edit,
+  CorruptedStateError,
+  InvalidEditError,
+} from "../lib/chain";
+import { TwilightMap } from "../editor/twilightmap";
+import { Result, TileIndex, Tile, MapSection } from "../types";
 
-class SetTiles implements ReversibleTwilightMapEdit {
+class SetTiles implements Edit<TwilightMap> {
   oldTiles: MapSection | undefined;
   newTiles: MapSection;
-  reversible: boolean;
+  _reversible: boolean;
   constructor(sec: MapSection) {
-    this.reversible = false;
+    this._reversible = false;
     this.newTiles = sec;
   }
 
-  forward(st: TwilightMapState): Result<void> {
+  forward(st: TwilightMap): Result<void> {
     const sel = new Set(this.newTiles.keys());
-    const sec = (st as TwilightMap).getMapSection(sel);
-    if (sec instanceof Error) return; // TODO add error handling.
+    const sec = st.getMapSection(sel);
+    if (sec instanceof Error) return new InvalidEditError(); // TODO add error handling.
     this.oldTiles = sec;
-    this.reversible = true;
-    (st as TwilightMap).setTiles(this.newTiles);
-    return; // TODO add error handling.
+    this._reversible = true;
+    return st.setTiles(this.newTiles);
   }
 
-  backward(st: TwilightMapState): Result<void> {
-    if (this.reversible !== true) return; // TODO add error handling.
-    (st as TwilightMap).setTiles(this.oldTiles as MapSection);
+  backward(st: TwilightMap): Result<void> {
+    if (this._reversible !== true)
+      return new InvalidEditError(
+        "Can't reverse setTiles before it's been performed"
+      );
+    return st.setTiles(this.oldTiles as MapSection);
+  }
+
+  get reversible(): boolean {
+    return this._reversible;
   }
 }
 
-class SetTile implements ReversibleTwilightMapEdit {
+class SetTile implements Edit<TwilightMap> {
   oldTile: Tile | undefined; // TODO decide on tile representation
   newTile: Tile; // TODO decide on tile representation
   index: TileIndex;
-  reversible: boolean;
+  _reversible: boolean;
   constructor(t: Tile, i: TileIndex) {
     this.newTile = t;
     this.index = i;
-    this.reversible = false;
+    this._reversible = false;
   }
 
-  forward(st: TwilightMapState): Result<void> {
-    const t = (st as TwilightMap).getTile(this.index);
+  forward(st: TwilightMap): Result<void> {
+    const t = st.getTile(this.index);
     if (t instanceof Error) return new InvalidEditError(t.message);
     this.oldTile = t;
-    this.reversible = true;
-    return (st as TwilightMap).setTile(this.newTile, this.index);
+    this._reversible = true;
+    return st.setTile(this.newTile, this.index);
   }
 
-  backward(st: TwilightMapState): Result<void> {
-    if (this.reversible !== true) return; // TODO add error handling.
-    (st as TwilightMap).setTile(this.oldTile as Tile, this.index);
+  backward(st: TwilightMap): Result<void> {
+    if (this._reversible !== true) return; // TODO add error handling.
+    st.setTile(this.oldTile as Tile, this.index);
+  }
+
+  get reversible(): boolean {
+    return this._reversible;
   }
 }
 
-class SwapTiles implements ReversibleTwilightMapEdit {
+class SwapTiles implements Edit<TwilightMap> {
   i: TileIndex;
   j: TileIndex;
-  reversible: boolean;
 
   constructor(i: TileIndex, j: TileIndex) {
     this.i = i;
     this.j = j;
-    this.reversible = true;
   }
 
-  forward(st: TwilightMapState): Result<void> {
-    (st as TwilightMap).swapTiles(this.i, this.j); // TODO add error handling
+  forward(st: TwilightMap): Result<void> {
+    return st.swapTiles(this.i, this.j);
   }
 
-  backward(st: TwilightMapState): Result<void> {
+  backward(st: TwilightMap): Result<void> {
     return this.forward(st);
+  }
+
+  get reversible(): boolean {
+    return true;
   }
 }
 
-class SwapManyTiles implements ReversibleTwilightMapEdit {
+class SwapManyTiles implements Edit<TwilightMap> {
   pairs: [TileIndex, TileIndex][];
-  reversible: boolean;
 
   constructor(pairs: [TileIndex, TileIndex][]) {
     this.pairs = pairs;
-    this.reversible = true;
   }
 
-  forward(st: TwilightMapState): Result<void> {
-    return (st as TwilightMap).swapManyTiles(this.pairs);
+  forward(st: TwilightMap): Result<void> {
+    return st.swapManyTiles(this.pairs);
   }
 
-  backward(st: TwilightMapState): Result<void> {
+  backward(st: TwilightMap): Result<void> {
     return this.forward(st);
+  }
+
+  get reversible(): boolean {
+    return true;
   }
 }
 
-class RotateTile implements ReversibleTwilightMapEdit {
+class RotateTile implements Edit<TwilightMap> {
   index: number;
   rotation: number;
-  reversible: boolean;
 
   constructor(index: number, rotation: number) {
     this.index = index;
     this.rotation = rotation;
-    this.reversible = true;
   }
 
-  forward(st: TwilightMapState): Result<void> {
-    return (st as TwilightMap).rotateTile(this.rotation, this.index);
+  forward(st: TwilightMap): Result<void> {
+    return st.rotateTile(this.rotation, this.index);
   }
 
-  backward(st: TwilightMapState): Result<void> {
-    return (st as TwilightMap).rotateTile(-this.rotation, this.index);
+  backward(st: TwilightMap): Result<void> {
+    return st.rotateTile(-this.rotation, this.index);
+  }
+
+  get reversible(): boolean {
+    return true;
   }
 }
 

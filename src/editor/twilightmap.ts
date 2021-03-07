@@ -1,7 +1,7 @@
 import Tiles from "../editor/tiles";
 import { State, CorruptedStateError } from "../lib/chain";
 import {
-  Tile
+  Tile,
   TileIndex,
   TwilightMapState,
   TileSelection,
@@ -13,7 +13,7 @@ const SPACES = [1, 7, 19, 37, 61, 91, 127, 169, 217, 271]; // SPACES[n] = 3n(n+1
 const MAX_RINGS = SPACES.length;
 const MAX_TILE_INDEX = SPACES[MAX_RINGS - 1] - 1;
 
-class TwilightMap implements TwilightMapState {
+class TwilightMap implements State {
   rings: number;
   board: Uint16Array;
   constructor(rings = 4, board?: Uint16Array) {
@@ -23,8 +23,8 @@ class TwilightMap implements TwilightMapState {
         ? new Uint16Array(1 + 3 * rings * (rings + 1))
         : board;
   }
-  clone(): TwilightMap {
-    return new TwilightMap(this.rings, this.board);
+  clone(): this {
+    return new TwilightMap(this.rings, this.board) as this;
   }
 
   /**
@@ -36,7 +36,9 @@ class TwilightMap implements TwilightMapState {
     if (!Number.isSafeInteger(r))
       return new Error("Number of rings must be an integer value");
     if (r < 1 || r >= SPACES.length)
-      return new RangeError(`Number of rings can't be greater than ${MAX_RINGS}`);
+      return new RangeError(
+        `Number of rings can't be greater than ${MAX_RINGS}`
+      );
     if (r === this.rings) return;
     if (r < this.rings) this.board = this.board.slice(0, SPACES[r]); // Shrink the board
     if (r > this.rings) {
@@ -74,7 +76,8 @@ class TwilightMap implements TwilightMapState {
   swapManyTiles(pairs: [TileIndex, TileIndex][]): Result<void> {
     for (const p of pairs) {
       const err = this.swapTiles(...p);
-      if (err instanceof Error) return new CorruptedStateError("Tile index out of range");
+      if (err instanceof Error)
+        return new CorruptedStateError("Tile index out of range");
     }
   }
 
@@ -90,9 +93,10 @@ class TwilightMap implements TwilightMapState {
    * Sets a number of tiles on the board at once.
    */
   setTiles(sec: MapSection): Result<void> {
-    for (const [t,i] of sec.entries()) {
+    for (const [t, i] of sec.entries()) {
       const err = this.setTile(t, i);
-      if (err instanceof Error) return new CorruptedStateError('Tile index out of range');
+      if (err instanceof Error)
+        return new CorruptedStateError("Tile index out of range");
     }
   }
 
@@ -111,7 +115,8 @@ class TwilightMap implements TwilightMapState {
   getMapSection(sel: TileSelection): Result<MapSection> {
     const sec: MapSection = new Map<TileIndex, Tile>();
     for (const i of sel) {
-      if (i >= this.board.length) return new RangeError("Selection index out of range");
+      if (i >= this.board.length)
+        return new RangeError("Selection index out of range");
       sec.set(i, this.board[i]);
     }
     return sec;
