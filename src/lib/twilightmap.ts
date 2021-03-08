@@ -1,13 +1,6 @@
-import Tiles from "../editor/tiles";
+import Tiles from "../lib/tiles";
 import { State, CorruptedStateError } from "../lib/chain";
-import {
-  Tile,
-  TileIndex,
-  TwilightMapState,
-  TileSelection,
-  MapSection,
-  Result,
-} from "../types";
+import { Tile, TileIndex, TileSelection, MapSection, Result } from "../types";
 
 const SPACES = [1, 7, 19, 37, 61, 91, 127, 169, 217, 271]; // SPACES[n] = 3n(n+1) + 1
 const MAX_RINGS = SPACES.length;
@@ -16,15 +9,26 @@ const MAX_TILE_INDEX = SPACES[MAX_RINGS - 1] - 1;
 class TwilightMap implements State {
   rings: number;
   board: Uint16Array;
-  constructor(rings = 4, board?: Uint16Array) {
-    this.rings = rings;
-    this.board =
-      board === undefined
-        ? new Uint16Array(1 + 3 * rings * (rings + 1))
-        : board;
+  constructor(input: number | Uint16Array) {
+    if (input instanceof Uint16Array) {
+      this.board = input;
+      const n = input.length - 1;
+      let r = 0;
+      for (r = 0; 3 * r * (r + 1) < n; r++);
+      this.rings = r;
+      this.board = new Uint16Array(1 + 3 * this.rings * (this.rings + 1));
+      for (let i = 0; i < input.length; i++) this.board[i] = input[i];
+    } else {
+      this.rings = input;
+      this.board = new Uint16Array(1 + 3 * this.rings * (this.rings + 1));
+    }
   }
   clone(): this {
-    return new TwilightMap(this.rings, this.board) as this;
+    return new TwilightMap(this.board) as this;
+  }
+
+  get size(): number {
+    return this.board.length;
   }
 
   /**
@@ -125,6 +129,23 @@ class TwilightMap implements State {
   getTile(i: TileIndex): Result<Tile> {
     return this.board[i];
   }
+
+  getAdjacencyLists(): number[][] {
+    // TODO
+    return [];
+  }
+
+  static fromTTSString(tts: string): Result<TwilightMap> {
+    const ttsTiles = tts.split(" "); // TODO what if they use commas?
+    if (!/18(-[0-5])?/.test(ttsTiles[0])) ttsTiles.unshift("18");
+    const board = new Uint16Array(ttsTiles.length);
+    for (let i = 0; i < ttsTiles.length; i++) {
+      const tile = Tiles.fromTTSString(ttsTiles[i]);
+      if (tile instanceof Error) return tile;
+      board[i] = tile;
+    }
+    return new TwilightMap(board);
+  }
 }
 
-export { TwilightMap };
+export default TwilightMap;

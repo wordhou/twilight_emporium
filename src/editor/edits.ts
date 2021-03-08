@@ -4,7 +4,7 @@ import {
   CorruptedStateError,
   InvalidEditError,
 } from "../lib/chain";
-import { TwilightMap } from "../editor/twilightmap";
+import TwilightMap from "../editor/twilightmap";
 import { Result, TileIndex, Tile, MapSection } from "../types";
 
 class SetTiles implements Edit<TwilightMap> {

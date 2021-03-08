@@ -14,7 +14,9 @@ function newTile(n: number, r?: rotation, f?: face): Tile {
 
 function fromTTSString(s: string): Result<Tile> {
   const re = /(-?\d+)(A|B)?(?:-([0-5]))?/.exec(s);
-  if (re === null) return Error("Invalid TTS string");
+  if (re === null) {
+    return Error(`Invalid TTS string ${s}`);
+  }
   const n = parseInt(re[1]);
   const r = re[3] === undefined ? undefined : (parseInt(re[3]) as rotation);
   const f = re[2] as face;
@@ -34,6 +36,13 @@ function toTTSString(t: Tile): string {
   const f = getFace(t);
   if (n === NEG_ONE) return "-1";
   return `${n}${f !== undefined ? f : ""}${r !== undefined ? `-${r}` : ""}`;
+}
+
+function getName(t: Tile): string {
+  const n = getNumber(t);
+  const f = getFace(t);
+  if (n === NEG_ONE) return "-1";
+  return `${n}${f !== undefined ? f : ""}`;
 }
 
 function getNumber(t: Tile): number {
@@ -79,6 +88,7 @@ function rotate(t: Tile, r: number): Tile {
 export default {
   newTile,
   toTTSString,
+  getName,
   fromTTSString,
   getNumber,
   setNumber,

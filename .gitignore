@@ -1,2 +1,7 @@
 node_modules
 .vim
+public/tiles
+scratch
+src/**/*.js
+**/*.jpg
+

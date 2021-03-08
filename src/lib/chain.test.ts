@@ -197,3 +197,17 @@ test("Too many redos throws error", () => {
   expect(eh.undo(7)).toBeUndefined();
   expect(eh.redo(8)).toBeInstanceOf(Error);
 });
+
+test("Undo does not accept non-integers or non-positive values", () => {
+  const eh = new EditHistory(new Num(5));
+  edits.forEach((ed) => eh.add(ed));
+  expect(eh.undo(-1)).toBeInstanceOf(Error);
+  expect(eh.undo(0.5)).toBeInstanceOf(Error);
+});
+
+test("Redo does not accept non-integers or non-positive values", () => {
+  const eh = new EditHistory(new Num(5));
+  edits.forEach((ed) => eh.add(ed));
+  expect(eh.redo(-1)).toBeInstanceOf(Error);
+  expect(eh.redo(0.5)).toBeInstanceOf(Error);
+});
