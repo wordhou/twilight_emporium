@@ -17,6 +17,7 @@
         "@typescript-eslint"
     ],
     "rules": {
-      "no-constant-condition" : ["warn", { "checkLoops": false }]
+      "no-constant-condition" : ["warn", { "checkLoops": false }],
+      "@typescript-eslint/no-var-requires": 0
     }
 }

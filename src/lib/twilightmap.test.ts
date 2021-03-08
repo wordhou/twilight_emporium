@@ -1,3 +1,3 @@
-import { TwilightMap } from "../editor/twilightmap";
+import TwilightMap from "./twilightmap";
 
 test.todo("");
