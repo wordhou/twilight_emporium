@@ -25,5 +25,9 @@ export default class TwilightMapGenerator {
     Object.assign(settings, this.settings);
   }
 
-  generate(seed: number): Reset<TwilightMap> {}
+  /*
+  generate(seed: number): Reset<TwilightMap> {
+    // TODO
+  }
+  */
 }

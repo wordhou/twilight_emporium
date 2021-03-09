@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: "./src/editor/index.ts",
@@ -26,11 +27,14 @@ module.exports = {
       },
     ],
   },
-  //resolve: {
-  //extensions: [".css", ".ts", ".js"],
-  //},
+  resolve: {
+    extensions: [".ts", ".js"],
+  },
   plugins: [
     //new MiniCssExtractPlugin(),
+    new CopyPlugin({
+      patterns: [{ from: "public", to: "dist" }],
+    }),
     new HtmlWebpackPlugin({
       title: "Hello world?",
       template: "./src/editor/index.html",
@@ -43,6 +47,10 @@ module.exports = {
   output: {
     filename: "main.js",
     path: path.resolve(__dirname, "dist"),
+    publicPath: "/",
     clean: true,
+  },
+  devServer: {
+    contentBase: path.resolve(__dirname, "public"),
   },
 };

@@ -36,8 +36,8 @@ interface Reset<S extends State> {
  * Represents a modification to a state value. Provides a forward method that mutates a state value, and optionally a backward method that undoes that mutation. The reversible property indicates whether or not the backward method can be performed.
  */
 interface Edit<S extends State> {
-  forward: (st: S) => Result<void>;
-  backward?: (st: S) => Result<void>;
+  forward: (st: S) => Result<unknown>;
+  backward?: (st: S) => Result<unknown>;
   reversible: boolean;
 }
 

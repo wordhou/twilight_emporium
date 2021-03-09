@@ -1,6 +1,6 @@
 import Tiles from "../lib/tiles";
 import { State, CorruptedStateError } from "../lib/chain";
-import { Tile, TileIndex, TileSelection, MapSection, Result } from "../types";
+import { Tile, TileIndex, MapSection, Result } from "../types";
 
 const SPACES = [1, 7, 19, 37, 61, 91, 127, 169, 217, 271]; // SPACES[n] = 3n(n+1) + 1
 const MAX_RINGS = SPACES.length;
@@ -116,7 +116,7 @@ class TwilightMap implements State {
   /**
    * Creates a view of part of the board given by a selection of tile indices.
    */
-  getMapSection(sel: TileSelection): Result<MapSection> {
+  getMapSection(sel: Iterable<TileIndex>): Result<MapSection> {
     const sec: MapSection = new Map<TileIndex, Tile>();
     for (const i of sel) {
       if (i >= this.board.length)

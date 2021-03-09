@@ -1,11 +1,12 @@
-//import { State, Edit, ReversibleEdit } from "./lib/chain";
-
 type Result<T> = T | Error;
+type Maybe<T> = T | null;
 
 type rotation = 0 | 1 | 2 | 3 | 4 | 5 | undefined;
 type face = "A" | "B" | undefined;
 
 type Tile = number;
+type TileSelection = Array<TileIndex>;
+type TileNameSet = Set<string>;
 
 /**
  * Stores a section of a TwilightMap as a map from indices to tiles
@@ -19,6 +20,15 @@ type MapSection = Map<TileIndex, Tile>;
  * increase going clockwise around the ring.
  */
 type TileIndex = number;
-type TileSelection = Set<TileIndex>;
 
-export { Result, rotation, face, Tile, TileIndex, TileSelection, MapSection };
+export {
+  Result,
+  Maybe,
+  rotation,
+  face,
+  Tile,
+  TileIndex,
+  TileSelection,
+  MapSection,
+  TileNameSet,
+};
