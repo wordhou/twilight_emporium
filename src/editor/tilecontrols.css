@@ -1,8 +1,50 @@
-.tilecontrols-button {
+.tile-controls-button {
   border-radius: 0.25em;
   padding: 0.5em;
-  width: 10em;
   text-align: center;
+  width: 20%;
   background-color: magenta;
   color: white;
+}
+
+.tile-controls-button i {
+  font-size: 2em;
+}
+
+.tileControls {
+  position: absolute;
+  overflow: visible;
+  z-index: 5;
+}
+
+.tileControlsButtonsWrapper {
+  position: relative;
+}
+
+.rotateCCW {
+  position: absolute;
+  top: 0%;
+  left: -10%;
+}
+.rotateCW {
+  position: absolute;
+  top: 0%;
+  left: 85%;
+}
+.resetRotation {
+  position: absolute;
+  top: -10%;
+  left: 40%;
+}
+.flipTile {
+  display: hidden;
+  position: absolute;
+  top: 80%;
+  left: 80%;
+}
+.clearTiles {
+  display: hidden;
+  position: absolute;
+  top: 80%;
+  left: -5%;
 }

@@ -1,23 +1,12 @@
-import {
-  Maybe,
-  Result,
-  Tile,
-  TileIndex,
-  TileSelection,
-  TileNameSet,
-} from "../types";
-import { EditHistory, Edit } from "../lib/chain";
-// import Component from "../lib/component";
+import { Maybe, Result, TileIndex, TileNameSet } from "../types";
+import { EditHistory } from "../lib/chain";
 import TwilightMap from "../lib/twilightmap";
 import BoardView from "./boardview";
 import Tiles from "../lib/tiles";
 import data from "../data.json";
-import {
-  EditorState,
-  EditorStateUpdate,
-  transitions,
-  Transition,
-} from "./editorstate";
+import Component from "../lib/component";
+import { EditorState, EditorStateUpdate, transitions } from "./editorstate";
+import TileSelector from "./tileselector";
 
 interface Settings {
   initial?: TwilightMap;
@@ -27,8 +16,8 @@ interface Editor extends Settings {}
 
 class Editor {
   target?: HTMLElement;
-  state: EditorState;
-  editHistory: EditHistory<TwilightMap>;
+  state: EditorState; // UI state of the editor
+  editHistory: EditHistory<TwilightMap>; // map state
   nodes!: Record<string, HTMLElement>;
   components!: {
     boardView: BoardView;
@@ -45,25 +34,19 @@ class Editor {
         dropTarget: [],
       });
     this.components = {
-      boardView: new BoardView(this.editHistory, this.state),
+      tileSelector: new TileSelector(this),
+      boardView: new BoardView(this),
+      generatorPane: new Component(),
     };
   }
 
   render(target: HTMLElement): void {
     this.target = target;
     target.innerHTML = `
-    <div class="tile-selector"></div>
-    <div class="board-view"></div>
-    <div class="generator-pane"></div>`;
-    this.nodes = {
-      tileSelector: target.querySelector(".tile-selector") as HTMLElement,
-      boardView: target.querySelector(".board-view") as HTMLElement,
-      generatorPane: target.querySelector(".generator-pane") as HTMLElement,
-    };
-
-    for (const key in this.components) {
-      this.components[key].render(this.nodes[key]);
-    }
+    <div class="tileSelector"></div>
+    <div class="boardView"></div>
+    <div class="generatorPane"></div>`;
+    this.nodes = Component.attachComponentsToNodes(this.components, target);
 
     this._addEventListeners();
   }
@@ -144,8 +127,7 @@ class Editor {
     const { edit, updated } = stateUpdate;
     this.state = stateUpdate;
     if (edit !== undefined) this.editHistory.add(edit);
-    if (updated !== undefined)
-      this.components.boardView.update(this.state, updated);
+    if (updated !== undefined) this.components.boardView.update(updated);
   }
 }
 

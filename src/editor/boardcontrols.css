@@ -1,0 +1,25 @@
+.boardControls {
+  background: yellow;
+}
+
+.mapInfo {
+  display: block;
+  background: limegreen;
+}
+
+.board-controls-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.board-controls-button {
+  display: block;
+
+  font-size: 1.5em;
+  border-radius: 0.25em;
+  padding: 0.5em;
+  margin: 0.25em;
+  text-align: center;
+  background-color: magenta;
+  color: white;
+}
