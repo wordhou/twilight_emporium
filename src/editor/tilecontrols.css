@@ -1,0 +1,8 @@
+.tilecontrols-button {
+  border-radius: 0.25em;
+  padding: 0.5em;
+  width: 10em;
+  text-align: center;
+  background-color: magenta;
+  color: white;
+}

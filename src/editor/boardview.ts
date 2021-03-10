@@ -4,8 +4,12 @@ import TwilightMap from "../lib/twilightmap";
 import * as Hex from "../lib/hex";
 import Tiles from "../lib/tiles";
 import { EditorState } from "./editorstate";
+import TileControls from "./tilecontrols";
+import "./boardview.css";
 
 type TileSelection = Iterable<number>;
+export type UpdatableElem = "tileControls" | "unusedTiles" | "boardSize";
+export type UpdateList = Iterable<number | UpdatableElem>;
 
 interface Settings {
   tileHeight: number;
@@ -19,14 +23,15 @@ const DEFAULT_SETTINGS: Settings = {
   tileNumberOverlay: false,
 };
 
-interface BoardView extends Settings {
-  target: HTMLElement;
-}
+interface BoardView extends Settings {}
 
 class BoardView {
+  target!: HTMLElement;
   tileWrappers: HTMLElement[];
   editorState: EditorState;
   editHistory: EditHistory<TwilightMap>;
+  nodes!: Record<string, HTMLElement>;
+  components!: Record<string, { render: (t: HTMLElement) => unknown }>;
   boardWidth!: number;
   boardHeight!: number;
   topOffset!: number;
@@ -37,52 +42,71 @@ class BoardView {
   }
 
   constructor(
-    target: HTMLElement,
     editHistory: EditHistory<TwilightMap>,
     editorState: EditorState,
     settings: Settings = DEFAULT_SETTINGS
   ) {
-    this.target = target;
     this.editHistory = editHistory;
     this.editorState = editorState;
     this.tileWrappers = [];
     this.tileWidth = settings.tileWidth;
     this.tileHeight = settings.tileHeight;
-    this.tileNumberOverlay = settings.tileNumberOverlay;
-    this._setBoardWidth();
+    this.components = {
+      tileControls: new TileControls(),
+    };
   }
 
-  _setBoardWidth(): Result<void> {
+  _setBoardSize(): Result<void> {
     const r = this.current.rings;
     this.boardWidth = this.tileWidth * (1 + 1.5 * r);
     this.boardHeight = this.tileHeight * (1 + 2 * r);
-    this.target.style.width = `${this.boardWidth}px`;
-    this.target.style.height = `${this.boardHeight}px`;
+    this.nodes.boardWrapper.style.width = `${this.boardWidth}px`;
+    this.nodes.boardWrapper.style.height = `${this.boardHeight}px`;
     this.topOffset = 0.5 * this.boardHeight - 0.5 * this.tileHeight;
     this.leftOffset = 0.5 * this.boardWidth - 0.5 * this.tileWidth;
   }
 
-  draw(): this {
+  _drawBoard(): void {
+    this._setBoardSize();
+
     this.current.board.forEach((t, i) => {
       if (i >= this.tileWrappers.length) this.addTileWrapper(i);
       this.drawTile(t, i);
     });
-    return this;
   }
 
-  update(st: EditorState, indices: Iterable<TileIndex>): this {
+  render(target: HTMLElement): void {
+    this.target = target;
+    target.innerHTML = `
+    <div class="tile-controls"></div>
+    <div class="board-wrapper"></div>`;
+
+    this.nodes = {
+      tileControls: target.querySelector(".tile-controls") as HTMLElement,
+      boardWrapper: target.querySelector(".board-wrapper") as HTMLElement,
+    };
+
+    this._drawBoard();
+  }
+
+  update(st: EditorState, indices: UpdateList): this {
     console.log("Updating tiles", indices);
     this.editorState = st;
     for (const i of indices) {
-      if (i < this.current.size) {
-        if (i >= this.tileWrappers.length) this.addTileWrapper(i);
-        this.drawTile(this.current.board[i], i);
+      if (typeof i === "number") {
+        if (i < this.current.size) {
+          if (i >= this.tileWrappers.length) this.addTileWrapper(i);
+          this.drawTile(this.current.board[i], i);
+        }
+      }
+      if (i === "tileControls") {
+        // TODO
       }
     }
     return this;
   }
 
-  drawTile(tile: number, index: number): this {
+  drawTile(tile: number, index: number): void {
     const div = this.tileWrappers[index];
     if (div === undefined)
       throw Error(`Tile with index ${index} does not exist.`);
@@ -96,11 +120,10 @@ class BoardView {
     img.classList.add("tile-img");
     div.classList.toggle("selected", has(this.editorState.selection, index));
     div.classList.toggle("droptarget", has(this.editorState.dropTarget, index));
+    div.classList.toggle("hidden", index >= this.current.size);
 
     img.src = `tiles/large/ST_${name}.png`;
     img.style.transform = `rotate(${r}deg)`;
-
-    return this;
   }
 
   addTileWrapper(index: number): Result<HTMLElement> {
@@ -113,7 +136,7 @@ class BoardView {
     div.style.height = `${this.tileHeight}px`;
     div.style.top = `${this.topOffset - y}px`;
     div.style.left = `${this.leftOffset + x}px`;
-    this.target.appendChild(div);
+    this.nodes.boardWrapper.appendChild(div);
     this.tileWrappers[index] = div;
     return div;
   }

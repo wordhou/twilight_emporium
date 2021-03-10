@@ -7,6 +7,7 @@ import {
   TileNameSet,
 } from "../types";
 import { EditHistory, Edit } from "../lib/chain";
+// import Component from "../lib/component";
 import TwilightMap from "../lib/twilightmap";
 import BoardView from "./boardview";
 import Tiles from "../lib/tiles";
@@ -19,30 +20,51 @@ import {
 } from "./editorstate";
 
 interface Settings {
-  target: HTMLElement;
   initial?: TwilightMap;
 }
 
 interface Editor extends Settings {}
 
 class Editor {
-  boardView: BoardView;
+  target?: HTMLElement;
   state: EditorState;
   editHistory: EditHistory<TwilightMap>;
+  nodes!: Record<string, HTMLElement>;
+  components!: {
+    boardView: BoardView;
+    [key: string]: {
+      render: (t: HTMLElement) => unknown;
+    };
+  };
+
   constructor(s: Settings) {
-    this.target = s.target;
     (this.editHistory = this._initializeEditHistory(s.initial)),
       (this.state = {
         name: "idle",
         selection: [],
         dropTarget: [],
       });
-    this.boardView = new BoardView(
-      this._createBoard(),
-      this.editHistory,
-      this.state
-    );
-    this.boardView.draw();
+    this.components = {
+      boardView: new BoardView(this.editHistory, this.state),
+    };
+  }
+
+  render(target: HTMLElement): void {
+    this.target = target;
+    target.innerHTML = `
+    <div class="tile-selector"></div>
+    <div class="board-view"></div>
+    <div class="generator-pane"></div>`;
+    this.nodes = {
+      tileSelector: target.querySelector(".tile-selector") as HTMLElement,
+      boardView: target.querySelector(".board-view") as HTMLElement,
+      generatorPane: target.querySelector(".generator-pane") as HTMLElement,
+    };
+
+    for (const key in this.components) {
+      this.components[key].render(this.nodes[key]);
+    }
+
     this._addEventListeners();
   }
 
@@ -61,22 +83,19 @@ class Editor {
     return new EditHistory(initState);
   }
 
-  _createBoard(): HTMLElement {
-    const boardDiv = document.createElement("div");
-    boardDiv.id = "board-view";
-    return this.target.appendChild(boardDiv);
-  }
-
   _addEventListeners(): Result<void> {
-    this.boardView.target.addEventListener("click", (ev) => {
+    const board = this.components.boardView.nodes.boardWrapper;
+    board.addEventListener("click", (ev) => {
       const index = getIndex(ev);
-      if (index === null) return false;
+      if (index === null) {
+        this.runState(transitions.clickElsewhere);
+        return;
+      }
       this.runState(transitions.clickTile(index));
-      console.log(this.state);
       ev.stopPropagation();
     });
 
-    this.boardView.target.addEventListener("dragstart", (ev) => {
+    board.addEventListener("dragstart", (ev) => {
       const index = getIndex(ev);
       if (index === null) return false;
       (ev.dataTransfer as DataTransfer).dropEffect = "move";
@@ -84,11 +103,11 @@ class Editor {
       ev.stopPropagation();
     });
 
-    this.boardView.target.addEventListener("dragover", (ev) => {
+    board.addEventListener("dragover", (ev) => {
       ev.preventDefault();
     });
 
-    this.boardView.target.addEventListener("dragenter", (ev) => {
+    board.addEventListener("dragenter", (ev) => {
       ev.preventDefault();
       const index = getIndex(ev);
       if (index === null) return false;
@@ -96,11 +115,19 @@ class Editor {
       ev.stopPropagation();
     });
 
-    this.boardView.target.addEventListener("drop", (ev) => {
+    board.addEventListener("drop", (ev) => {
       const index = getIndex(ev);
       if (index === null) return false;
       ev.preventDefault();
       this.runState(transitions.dropOnTile(index));
+    });
+
+    (this.target as HTMLElement).addEventListener("rotateTile", (ev) => {
+      if ((ev as CustomEvent).detail === "cw")
+        this.runState(transitions.clickRotate(1));
+      if ((ev as CustomEvent).detail === "ccw")
+        this.runState(transitions.clickRotate(5));
+      ev.stopPropagation();
     });
 
     document.addEventListener("dragend", (ev) => {
@@ -117,7 +144,8 @@ class Editor {
     const { edit, updated } = stateUpdate;
     this.state = stateUpdate;
     if (edit !== undefined) this.editHistory.add(edit);
-    if (updated !== undefined) this.boardView.update(this.state, updated);
+    if (updated !== undefined)
+      this.components.boardView.update(this.state, updated);
   }
 }
 

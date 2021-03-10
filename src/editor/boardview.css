@@ -1,0 +1,21 @@
+.board-wrapper {
+  background-color: #eeeeee;
+  position: relative;
+}
+
+.tile-wrapper {
+  /* border: thin lightslategrey solid;*/
+  position: absolute;
+}
+
+.tile-img {
+  pointer-events: none;
+}
+
+.tile-wrapper.selected > img {
+  filter: contrast(0.4) brightness(1.5);
+}
+
+.tile-wrapper.droptarget > img {
+  filter: contrast(0.2) brightness(0.8);
+}
