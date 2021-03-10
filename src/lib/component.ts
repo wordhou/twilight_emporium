@@ -1,9 +1,9 @@
 export interface IComponent {
   render: (target: HTMLElement) => void;
-  update?: (...params: unknown[]) => void;
+  update?: (args?: any) => void;
 }
 
-export default class Component {
+export default class Component implements IComponent {
   static getNodesFromElement(
     components: Iterable<string>,
     target: Element

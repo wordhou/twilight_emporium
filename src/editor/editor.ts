@@ -5,6 +5,7 @@ import BoardView from "./boardview";
 import Tiles from "../lib/tiles";
 import data from "../data.json";
 import Component from "../lib/component";
+import { IComponent } from "../lib/component";
 import { EditorState, EditorStateUpdate, transitions } from "./editorstate";
 import TileSelector from "./tileselector";
 
@@ -15,15 +16,15 @@ interface Settings {
 interface Editor extends Settings {}
 
 class Editor {
-  target?: HTMLElement;
+  target!: HTMLElement;
   state: EditorState; // UI state of the editor
   editHistory: EditHistory<TwilightMap>; // map state
   nodes!: Record<string, HTMLElement>;
   components!: {
     boardView: BoardView;
-    [key: string]: {
-      render: (t: HTMLElement) => unknown;
-    };
+    tileSelector: TileSelector;
+    //generatorPane: Component;
+    [key: string]: IComponent;
   };
 
   constructor(s: Settings) {
@@ -36,7 +37,7 @@ class Editor {
     this.components = {
       tileSelector: new TileSelector(this),
       boardView: new BoardView(this),
-      generatorPane: new Component(),
+      //generatorPane: new Component(),
     };
   }
 
@@ -105,7 +106,7 @@ class Editor {
       this.runState(transitions.dropOnTile(index));
     });
 
-    (this.target as HTMLElement).addEventListener("rotateTile", (ev) => {
+    this.target.addEventListener("rotateTile", (ev) => {
       if ((ev as CustomEvent).detail === "cw")
         this.runState(transitions.clickRotate(1));
       if ((ev as CustomEvent).detail === "ccw")
@@ -113,7 +114,9 @@ class Editor {
       ev.stopPropagation();
     });
 
-    document.addEventListener("dragend", (ev) => {
+    this.target.addEventListener;
+
+    board.addEventListener("dragend", (ev) => {
       ev.preventDefault();
       this.runState(transitions.dragEndDocument);
     });
@@ -127,7 +130,11 @@ class Editor {
     const { edit, updated } = stateUpdate;
     this.state = stateUpdate;
     if (edit !== undefined) this.editHistory.add(edit);
-    if (updated !== undefined) this.components.boardView.update(updated);
+    if (updated === undefined) return;
+    for (const comp in updated) {
+      const component = this.components[comp];
+      if (component.update !== undefined) component.update(updated[comp]);
+    }
   }
 }
 

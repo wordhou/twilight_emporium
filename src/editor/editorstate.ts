@@ -3,8 +3,9 @@ import { Edit } from "../lib/chain";
 import * as Edits from "./edits";
 import * as util from "../lib/util";
 import * as Hex from "../lib/hex";
-import { UpdatableElem, UpdateList } from "./boardview";
+import { UpdatableElem, BoardViewUpdate } from "./boardview";
 import TwilightMap from "../lib/twilightmap";
+import { IComponent } from "../lib/component";
 
 const editorStateNames = ["idle", "selection", "dragging"] as const;
 type StateNames = typeof editorStateNames[number];
@@ -17,7 +18,10 @@ interface EditorState {
 }
 
 interface EditorStateUpdate extends EditorState {
-  updated?: UpdateList;
+  updated?: {
+    boardView?: BoardViewUpdate;
+    [key: string]: unknown;
+  };
   edit?: Edit<TwilightMap>;
 }
 
@@ -33,7 +37,7 @@ const transitions = {
         name: "selection",
         selection: [i],
         dropTarget: [],
-        updated: ["tileControls", i],
+        updated: { boardView: ["tileControls", i] },
       };
     if (name === "selection") {
       const unselect = selection.includes(i);
@@ -41,7 +45,7 @@ const transitions = {
         name: selection.every((s) => s === i) ? "idle" : "selection",
         selection: unselect ? selection.filter((s) => s !== i) : [i], // Multi-select: selection.concat(i),
         dropTarget: [],
-        updated: ["tileControls", ...selection, i],
+        updated: { boardView: ["tileControls", ...selection, i] },
       };
     }
   },
@@ -55,7 +59,7 @@ const transitions = {
         selection: [i],
         dropTarget: [i],
         dragShape: [[0, 0]],
-        updated: [i],
+        updated: { boardView: [i] },
       };
     if (name === "selection") {
       return selection.includes(i)
@@ -64,7 +68,7 @@ const transitions = {
             selection,
             dropTarget: [i],
             dragShape: [[0, 0]],
-            updated: ["tileControls", i],
+            updated: { boardView: ["tileControls", i] },
           }
         : { name, selection, dropTarget: [] };
     }
@@ -82,7 +86,7 @@ const transitions = {
         selection,
         dropTarget: newDropTarget,
         dragShape,
-        updated: [...dropTarget, ...newDropTarget],
+        updated: { boardView: [...dropTarget, ...newDropTarget] },
       };
     }
   },
@@ -98,7 +102,9 @@ const transitions = {
         name: "idle",
         selection: [],
         dropTarget: [],
-        updated: ["tileControls", ...selection, ...newDropTarget],
+        updated: {
+          boardView: ["tileControls", ...selection, ...newDropTarget],
+        },
         edit: new Edits.SwapManyTiles(util.zip(selection, dropTarget)),
       };
     }
@@ -113,7 +119,7 @@ const transitions = {
         name: "idle",
         selection: [],
         dropTarget: [],
-        updated: ["tileControls", ...selection, ...dropTarget],
+        updated: { boardView: ["tileControls", ...selection, ...dropTarget] },
       };
     }
   },
@@ -126,7 +132,7 @@ const transitions = {
         name: "idle",
         selection: [],
         dropTarget: [],
-        updated: ["tileControls", ...selection],
+        updated: { boardView: ["tileControls", ...selection] },
       };
     }
   },
@@ -141,7 +147,7 @@ const transitions = {
         selection,
         dropTarget,
         edit: new Edits.RotateTile(selection[0], r),
-        updated: selection,
+        updated: { boardView: selection },
       };
   },
   clickResetRotation: () => ({

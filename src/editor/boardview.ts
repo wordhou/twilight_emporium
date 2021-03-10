@@ -12,7 +12,7 @@ import "./boardview.css";
 
 type TileSelection = Iterable<number>;
 export type UpdatableElem = "tileControls" | "unusedTiles" | "boardSize";
-export type UpdateList = Iterable<number | UpdatableElem>;
+export type BoardViewUpdate = Iterable<number | UpdatableElem>;
 
 interface Settings {
   tileHeight: number;
@@ -85,9 +85,9 @@ class BoardView extends Component {
     this._drawBoard();
   }
 
-  update(indices: UpdateList): this {
-    console.log("Updating tiles", indices);
-    for (const i of indices) {
+  update(updatedElements: BoardViewUpdate): void {
+    console.log("Updating tiles", updatedElements);
+    for (const i of updatedElements) {
       if (typeof i === "number") {
         if (i < this.current.size) {
           if (i >= this.tileWrappers.length) this._addTileWrapper(i);
@@ -99,7 +99,6 @@ class BoardView extends Component {
       }
     }
     this.components.tileControls.update();
-    return this;
   }
 
   _drawBoard(): void {

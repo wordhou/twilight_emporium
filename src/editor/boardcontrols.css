@@ -23,3 +23,7 @@
   background-color: magenta;
   color: white;
 }
+
+.board-controls-button.inactive {
+  background-color: grey;
+}
