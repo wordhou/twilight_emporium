@@ -6,12 +6,12 @@ import Tiles from "../lib/tiles";
 import { EditorState } from "./editorstate";
 import Editor from "./editor";
 import TileControls from "./tilecontrols";
-import BoardControls from "./boardcontrols";
 import Component from "../lib/component";
 import "./boardview.css";
+import BoardControls from "./boardcontrols";
 
 type TileSelection = Iterable<number>;
-export type UpdatableElem = "tileControls" | "unusedTiles" | "boardSize";
+export type UpdatableElem = "tileControls" | "allIndices" | "boardSize";
 export type BoardViewUpdate = Iterable<number | UpdatableElem>;
 
 interface Settings {
@@ -34,8 +34,8 @@ class BoardView extends Component {
   editor: Editor;
   nodes!: Record<string, HTMLElement>;
   components!: {
-    boardControls: BoardControls;
     tileControls: TileControls;
+    boardControls: BoardControls;
   };
   boardWidth!: number;
   boardHeight!: number;
@@ -60,9 +60,10 @@ class BoardView extends Component {
     this.tileWrappers = [];
     this.tileWidth = settings.tileWidth;
     this.tileHeight = settings.tileHeight;
+    this.tileNumberOverlay = settings.tileNumberOverlay;
     this.components = {
       tileControls: new TileControls(this),
-      boardControls: new BoardControls(),
+      boardControls: new BoardControls(this),
     };
   }
 
@@ -71,18 +72,17 @@ class BoardView extends Component {
     target.innerHTML = `
     <div class="boardControls"></div>
     <div class="boardWrapper">
-    <div class="tileControls"></div>
+      <div class="tileControls"></div>
     </div>
     `;
 
-    this.nodes = Component.getNodesFromElement(
-      ["tileControls", "boardWrapper", "boardControls"],
-      target
-    );
+    this.nodes = Component.attachComponentsToNodes(this.components, target);
 
-    this.components.tileControls.render(this.nodes.tileControls);
-    this.components.boardControls.render(this.nodes.boardControls);
+    this.nodes.boardWrapper = target.querySelector(
+      ".boardWrapper"
+    ) as HTMLElement;
     this._drawBoard();
+    this._addEventListeners();
   }
 
   update(updatedElements: BoardViewUpdate): void {
@@ -94,15 +94,23 @@ class BoardView extends Component {
           this._drawTile(this.current.board[i], i);
         }
       }
-      if (i === "tileControls") {
-        // TODO
-      }
+      if (i === "tileControls") this.components.tileControls.update();
+      if (i === "allIndices")
+        this.current.board.forEach((t, i) => this._drawTile(t, i));
     }
-    this.components.tileControls.update();
+  }
+
+  _addEventListeners(): void {
+    this.target.addEventListener("toggleNumbers", (ev) => {
+      this.tileNumberOverlay = !this.tileNumberOverlay;
+      this.style();
+      ev.stopPropagation();
+    });
   }
 
   _drawBoard(): void {
-    this._setBoardSize();
+    this._computeOffsets();
+    this.style();
 
     this.current.board.forEach((t, i) => {
       if (i >= this.tileWrappers.length) this._addTileWrapper(i);
@@ -110,15 +118,21 @@ class BoardView extends Component {
     });
   }
 
-  _setBoardSize(): Result<void> {
+  _computeOffsets(): void {
     const r = this.current.rings;
     this.boardWidth = this.tileWidth * (1 + 1.5 * r);
     this.boardHeight = this.tileHeight * (1 + 2 * r);
-    this.nodes.boardWrapper.style.width = `${this.boardWidth}px`;
-    this.nodes.boardWrapper.style.height = `${this.boardHeight}px`;
     this.topOffset = 0.5 * this.boardHeight - 0.5 * this.tileHeight;
     this.leftOffset = 0.5 * this.boardWidth - 0.5 * this.tileWidth;
   }
+
+  style(): Result<void> {
+    const bw = this.nodes.boardWrapper;
+    bw.style.width = `${this.boardWidth}px`;
+    bw.style.height = `${this.boardHeight}px`;
+    bw.classList.toggle("tile-numbers", this.tileNumberOverlay);
+  }
+
   _drawTile(tile: number, index: number): void {
     const div = this.tileWrappers[index];
     if (div === undefined)
@@ -141,6 +155,8 @@ class BoardView extends Component {
 
   _addTileWrapper(index: number): Result<HTMLElement> {
     const div = document.createElement("div");
+    div.innerHTML = `<div class="number-overlay">${index}</div>
+    `;
     div.classList.add("tile-wrapper");
     div.setAttribute("draggable", "true");
     div.dataset.i = `${index}`;

@@ -1,23 +1,22 @@
-import "./boardcontrols.css";
+import "./editorcontrols.css";
 import Component from "../lib/component";
 import Editor from "./editor";
-import BoardView from "./boardview";
 
-export default class BoardControls extends Component {
-  boardView: BoardView;
+export default class EditorControls extends Component {
+  editor: Editor;
   nodes!: Record<string, HTMLElement>;
   components!: Record<string, Component>;
   target!: HTMLElement;
 
-  constructor(boardView: BoardView) {
+  constructor(editor: Editor) {
     super();
-    this.boardView = boardView;
+    this.editor = editor;
     this.components = {
-      zoomIn: this.button("", "Zoom in", "zoomIn"),
-      zoomOut: this.button("", "Zoom out", "zoomOut"),
-      addRing: this.button("", "Add ring", "addRing"),
-      removeRing: this.button("", "Remove ring", "removeRing"),
-      toggleNumbers: this.button("", "Toggle numbers", "toggleNumbers"),
+      mapInfo: this.info(),
+      undoEdit: this.button("", "Undo", "undoEdit"),
+      redoEdit: this.button("", "Redo", "redoEdit"),
+      saveMap: this.button("", "Save", "saveMap"),
+      newMap: this.button("", "New", "newMap"),
     };
   }
 
@@ -25,12 +24,11 @@ export default class BoardControls extends Component {
     this.target = target;
     target.innerHTML = `
     <div class="mapInfo"></div>
-    <nav class="board-controls-wrapper">
-      <div class="zoomIn"></div>
-      <div class="zoomOut"></div>
-      <div class="addRing"></div>
-      <div class="removeRing"></div>
-      <div class="toggleNumbers"></div>
+    <nav class="editor-controls-wrapper">
+      <div class="undoEdit"></div>
+      <div class="redoEdit"></div>
+      <div class="saveMap"></div>
+      <div class="newMap"></div>
     </nav>
     `;
     this.nodes = Component.attachComponentsToNodes(
@@ -41,8 +39,8 @@ export default class BoardControls extends Component {
   }
 
   style(): void {
-    //this.nodes.undoEdit.classList.toggle("inactive", false /*TODO*/);
-    //this.nodes.redoEdit.classList.toggle("inactive", false /*TODO*/);
+    this.nodes.undoEdit.classList.toggle("inactive", false /*TODO*/);
+    this.nodes.redoEdit.classList.toggle("inactive", false /*TODO*/);
   }
 
   button(
@@ -53,7 +51,7 @@ export default class BoardControls extends Component {
   ): Component {
     return {
       render: (el: HTMLElement) => {
-        el.classList.add("board-controls-button");
+        el.classList.add("editor-controls-button");
         el.innerHTML = `<a><i class="${bootstrapIcon}"></i>${text}</a>`;
         el.addEventListener("click", () => {
           const customEvent = new CustomEvent(eventName, {
@@ -62,6 +60,15 @@ export default class BoardControls extends Component {
           });
           el.dispatchEvent(customEvent);
         });
+      },
+    };
+  }
+
+  info(): Component {
+    return {
+      render: (t: HTMLElement) => {
+        t.innerHTML = `
+        <h1>file name</h1>: ${"helloworld"}`;
       },
     };
   }

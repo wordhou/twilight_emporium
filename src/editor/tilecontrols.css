@@ -1,8 +1,10 @@
 .tile-controls-button {
+  position: absolute;
+  z-index: 10;
   border-radius: 0.25em;
   padding: 0.5em;
   text-align: center;
-  width: 20%;
+  width: 75px;
   background-color: magenta;
   color: white;
 }
@@ -13,38 +15,31 @@
 
 .tileControls {
   position: absolute;
+  width: 0px;
+  height: 0px;
   overflow: visible;
   z-index: 5;
 }
 
-.tileControlsButtonsWrapper {
-  position: relative;
-}
-
 .rotateCCW {
-  position: absolute;
-  top: 0%;
-  left: -10%;
+  top: 0px;
+  left: -37.4px;
 }
 .rotateCW {
-  position: absolute;
-  top: 0%;
-  left: 85%;
+  top: 0px;
+  left: 318px;
 }
 .resetRotation {
-  position: absolute;
-  top: -10%;
-  left: 40%;
+  top: -31.7px;
+  left: 150px;
 }
 .flipTile {
-  display: hidden;
-  position: absolute;
+  display: none;
   top: 80%;
   left: 80%;
 }
 .clearTiles {
-  display: hidden;
-  position: absolute;
+  display: none;
   top: 80%;
   left: -5%;
 }

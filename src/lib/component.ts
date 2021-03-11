@@ -4,7 +4,7 @@ export interface IComponent {
 }
 
 export default class Component implements IComponent {
-  static getNodesFromElement(
+  static getNodesByClass(
     components: Iterable<string>,
     target: Element
   ): Record<string, HTMLElement> {

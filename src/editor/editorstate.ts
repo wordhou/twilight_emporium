@@ -1,9 +1,10 @@
-import { TileIndex, TileSelection } from "../types";
+import { Tile, TileIndex, TileName, TileSelection } from "../types";
 import { Edit } from "../lib/chain";
 import * as Edits from "./edits";
 import * as util from "../lib/util";
 import * as Hex from "../lib/hex";
-import { UpdatableElem, BoardViewUpdate } from "./boardview";
+import { BoardViewUpdate } from "./boardview";
+import { TileSelectorUpdate } from "./tileselector";
 import TwilightMap from "../lib/twilightmap";
 import { IComponent } from "../lib/component";
 
@@ -15,13 +16,17 @@ interface EditorState {
   selection: TileSelection;
   dropTarget: TileSelection;
   dragShape?: Hex.Hex[];
+  tile?: Tile;
+}
+
+export interface EditorComponentUpdate {
+  boardView?: BoardViewUpdate;
+  tileSelector?: TileSelectorUpdate;
+  [key: string]: unknown;
 }
 
 interface EditorStateUpdate extends EditorState {
-  updated?: {
-    boardView?: BoardViewUpdate;
-    [key: string]: unknown;
-  };
+  updated?: EditorComponentUpdate;
   edit?: Edit<TwilightMap>;
 }
 
@@ -49,7 +54,7 @@ const transitions = {
       };
     }
   },
-  dragTile: (i: TileIndex) => ({
+  dragBoardTile: (i: TileIndex) => ({
     name,
     selection,
   }: EditorState): EditorStateUpdate | undefined => {
@@ -73,9 +78,22 @@ const transitions = {
         : { name, selection, dropTarget: [] };
     }
   },
+  dragUnusedTile: (tile: Tile) => ({
+    name,
+  }: EditorState): EditorStateUpdate | undefined => {
+    if (name === "idle")
+      return {
+        name: "dragging",
+        selection: [],
+        tile,
+        dropTarget: [],
+        dragShape: [[0, 0]],
+      };
+  },
   dragEnterTile: (i: TileIndex) => ({
     name,
     selection,
+    tile,
     dropTarget,
     dragShape,
   }: EditorState): EditorStateUpdate | undefined => {
@@ -84,6 +102,7 @@ const transitions = {
       return {
         name: "dragging",
         selection,
+        tile,
         dropTarget: newDropTarget,
         dragShape,
         updated: { boardView: [...dropTarget, ...newDropTarget] },
@@ -93,20 +112,33 @@ const transitions = {
   dropOnTile: (i: TileIndex) => ({
     name,
     selection,
+    tile,
     dropTarget,
     dragShape,
   }: EditorState): EditorStateUpdate | undefined => {
     if (name === "dragging") {
       const newDropTarget = Hex.addDragShape(dragShape as Hex.Hex[], i); // Should be the same as dropTarget but, recalculate anyway
-      return {
-        name: "idle",
-        selection: [],
-        dropTarget: [],
-        updated: {
-          boardView: ["tileControls", ...selection, ...newDropTarget],
-        },
-        edit: new Edits.SwapManyTiles(util.zip(selection, dropTarget)),
-      };
+      if (selection.length > 0)
+        return {
+          name: "idle",
+          selection: [],
+          dropTarget: [],
+          updated: {
+            boardView: ["tileControls", ...selection, ...newDropTarget],
+          },
+          edit: new Edits.SwapManyTiles(util.zip(selection, dropTarget)),
+        };
+      if (tile !== undefined)
+        return {
+          name: "idle",
+          selection: [],
+          dropTarget: [],
+          updated: {
+            tileSelector: { all: true },
+            boardView: ["tileControls", ...dropTarget, ...newDropTarget],
+          },
+          edit: new Edits.SetTile(tile, newDropTarget[0]),
+        };
     }
   },
   dragEndDocument: ({
@@ -150,7 +182,7 @@ const transitions = {
         updated: { boardView: selection },
       };
   },
-  clickResetRotation: () => ({
+  clickResetTiles: ({
     name,
     selection,
     dropTarget,
@@ -160,8 +192,8 @@ const transitions = {
         name,
         selection,
         dropTarget,
-        edit: undefined, // TODO
-        updated: undefined, //TODO
+        edit: new Edits.ResetTiles(selection),
+        updated: { boardView: [...selection] }, //TODO
       };
     }
   },

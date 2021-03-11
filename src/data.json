@@ -2,63 +2,63 @@
   "tiles": {
     "1": {
       "type": "green",
-      "race": "The Federation of Sol",
+      "faction": "The Federation of Sol",
       "planets": [
         "Jord"
       ]
     },
     "2": {
       "type": "green",
-      "race": "The Mentak Coalition",
+      "faction": "The Mentak Coalition",
       "planets": [
         "Moll Primus"
       ]
     },
     "3": {
       "type": "green",
-      "race": "The Yin Brotherhood",
+      "faction": "The Yin Brotherhood",
       "planets": [
         "Darien"
       ]
     },
     "4": {
       "type": "green",
-      "race": "The Embers of Muaat",
+      "faction": "The Embers of Muaat",
       "planets": [
         "Muaat"
       ]
     },
     "5": {
       "type": "green",
-      "race": "The Arborec",
+      "faction": "The Arborec",
       "planets": [
         "Nestphar"
       ]
     },
     "6": {
       "type": "green",
-      "race": "The Lizix Mindnet",
+      "faction": "The Lizix Mindnet",
       "planets": [
         "[0.0.0]"
       ]
     },
     "7": {
       "type": "green",
-      "race": "The Winnu",
+      "faction": "The Winnu",
       "planets": [
         "Winnu"
       ]
     },
     "8": {
       "type": "green",
-      "race": "The Nekro Virus",
+      "faction": "The Nekro Virus",
       "planets": [
         "Mordai II"
       ]
     },
     "9": {
       "type": "green",
-      "race": "The Naalu Collective",
+      "faction": "The Naalu Collective",
       "planets": [
         "Maaluuk",
         "Druaa"
@@ -66,7 +66,7 @@
     },
     "10": {
       "type": "green",
-      "race": "The Barony of Letnev",
+      "faction": "The Barony of Letnev",
       "planets": [
         "Arc Prime",
         "Wren Terra"
@@ -74,7 +74,7 @@
     },
     "11": {
       "type": "green",
-      "race": "The Clan of Saar",
+      "faction": "The Clan of Saar",
       "planets": [
         "Lisis II",
         "Ragh"
@@ -82,7 +82,7 @@
     },
     "12": {
       "type": "green",
-      "race": "The Universities of Jol-Nar",
+      "faction": "The Universities of Jol-Nar",
       "planets": [
         "Nar",
         "Jol"
@@ -90,7 +90,7 @@
     },
     "13": {
       "type": "green",
-      "race": "Sardakk N'orr",
+      "faction": "Sardakk N'orr",
       "planets": [
         "Tren'lak",
         "Quinarra"
@@ -98,7 +98,7 @@
     },
     "14": {
       "type": "green",
-      "race": "The Xxcha Kingdom",
+      "faction": "The Xxcha Kingdom",
       "planets": [
         "Archon Ren",
         "Archon Tau"
@@ -106,7 +106,7 @@
     },
     "15": {
       "type": "green",
-      "race": "The Yssaril Tribes",
+      "faction": "The Yssaril Tribes",
       "planets": [
         "Retillion",
         "Shalloq"
@@ -114,7 +114,7 @@
     },
     "16": {
       "type": "green",
-      "race": "The Emirates of Hacan",
+      "faction": "The Emirates of Hacan",
       "planets": [
         "Arretze",
         "Hercant",
@@ -123,7 +123,7 @@
     },
     "17": {
       "type": "green",
-      "race": "The Ghosts of Creuss",
+      "faction": "The Ghosts of Creuss",
       "wormhole": "delta",
       "planets": []
     },
@@ -327,46 +327,53 @@
       "wormhole": "delta",
       "planets": [
         "Creuss"
-      ]
+      ],
+      "unplayable": true
     },
     "52": {
       "type": "green",
-      "race": "The Mahact Gene-sorcerers",
+      "pok": true,
+      "faction": "The Mahact Gene-sorcerers",
       "planets": [
         "Ixth"
       ]
     },
     "53": {
       "type": "green",
-      "race": "The Nomad",
+      "pok": true,
+      "faction": "The Nomad",
       "planets": [
         "Arcturus"
       ]
     },
     "54": {
       "type": "green",
-      "race": "The Vuil'raith Cabal",
+      "pok": true,
+      "faction": "The Vuil'raith Cabal",
       "planets": [
         "Acheron"
       ]
     },
     "55": {
       "type": "green",
-      "race": "The Titans of Ul",
+      "pok": true,
+      "faction": "The Titans of Ul",
       "planets": [
         "Elysium"
       ]
     },
     "56": {
       "type": "green",
-      "race": "The Empyrean",
+      "pok": true,
+      "faction": "The Empyrean",
       "planets": [
         "The Dark"
       ]
     },
     "57": {
       "type": "green",
-      "race": "The Naaz-Rokha Alliance",
+      "pok": true,
+      "faction": "The Naaz-Rokha Alliance",
       "planets": [
         "Naazir",
         "Rokha"
@@ -374,7 +381,8 @@
     },
     "58": {
       "type": "green",
-      "race": "The Argent Flight",
+      "pok": true,
+      "faction": "The Argent Flight",
       "planets": [
         "Valk",
         "Avar",
@@ -383,36 +391,42 @@
     },
     "59": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Archon Vail"
       ]
     },
     "60": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Perimeter"
       ]
     },
     "61": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Perimeter"
       ]
     },
     "62": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Sem-Lore"
       ]
     },
     "63": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Vorhal"
       ]
     },
     "64": {
       "type": "blue",
+      "pok": true,
       "wormhole": "beta",
       "planets": [
         "Atlas"
@@ -420,18 +434,21 @@
     },
     "65": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Primor"
       ]
     },
     "66": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Hope's End"
       ]
     },
     "67": {
       "type": "red",
+      "pok": true,
       "anomaly": "gravity-rift",
       "planets": [
         "Cormund"
@@ -439,6 +456,7 @@
     },
     "68": {
       "type": "red",
+      "pok": true,
       "anomaly": "nebula",
       "planets": [
         "Everra"
@@ -446,6 +464,7 @@
     },
     "69": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Accoen",
         "Jeol Ir"
@@ -453,6 +472,7 @@
     },
     "70": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Kraag",
         "Siig"
@@ -460,6 +480,7 @@
     },
     "71": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Ba'Kal",
         "Alio Prima"
@@ -467,6 +488,7 @@
     },
     "72": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Lisis",
         "Velnor"
@@ -474,6 +496,7 @@
     },
     "73": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Lisis",
         "Xanhact"
@@ -481,6 +504,7 @@
     },
     "74": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Vega Major",
         "Vega Minor"
@@ -488,6 +512,7 @@
     },
     "75": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Loki",
         "Abaddon",
@@ -496,6 +521,7 @@
     },
     "76": {
       "type": "blue",
+      "pok": true,
       "planets": [
         "Rigel I",
         "Rigel II",
@@ -504,20 +530,24 @@
     },
     "77": {
       "type": "red",
+      "pok": true,
       "planets": []
     },
     "78": {
       "type": "red",
+      "pok": true,
       "planets": []
     },
     "79": {
       "type": "red",
+      "pok": true,
       "wormhole": "alpha",
       "anomaly": "asteroid-field",
       "planets": []
     },
     "80": {
       "type": "red",
+      "pok": true,
       "anomaly": "supernova",
       "planets": []
     },
@@ -528,7 +558,8 @@
     },
     "82": {
       "type": "blue",
-      "wormhole": "all",
+      "wormhole": ["alpha", "beta", "delta"],
+      "unplayable": true,
       "planets": [
         "Mallice"
       ]

@@ -113,6 +113,16 @@ class TwilightMap implements State {
     this.board[i] = t;
   }
 
+  resetTiles(tileIndices: Iterable<TileIndex>): Result<void> {
+    for (const i of tileIndices) {
+      if (i > MAX_TILE_INDEX)
+        return new CorruptedStateError("Tile index out of range");
+      const t = Tiles.fromTTSString(Tiles.getName(this.board[i]));
+      if (t instanceof Error) return new CorruptedStateError(t.message);
+      this.board[i] = t;
+    }
+  }
+
   /**
    * Creates a view of part of the board given by a selection of tile indices.
    */

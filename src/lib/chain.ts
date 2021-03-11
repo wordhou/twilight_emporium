@@ -92,7 +92,7 @@ class EditHistory<S extends State> implements IEditHistory<S> {
   }
 
   add(ed: Reset<S> | Edit<S>): void {
-    if (!this.onTop()) this.states.splice(this.index);
+    if (!this.onTop()) this.states.splice(this.index + 1);
     if (!isEdit(ed)) {
       this.states.push(ed.state);
       this.index++;

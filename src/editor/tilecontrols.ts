@@ -53,8 +53,6 @@ export default class TileControls extends Component {
 
   _style(): void {
     const edState = this.boardView.editorState;
-    this.nodes.buttonWrapper.style.width = this.boardView.tileWidth + "px";
-    this.nodes.buttonWrapper.style.height = this.boardView.tileHeight + "px";
     if (edState.name === "selection" && edState.selection.length === 1) {
       const sel = edState.selection[0];
       const [x, y] = Hex.spiralToXY(

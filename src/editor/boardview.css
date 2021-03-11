@@ -19,3 +19,17 @@
 .tile-wrapper.droptarget > img {
   filter: contrast(0.2) brightness(0.8);
 }
+
+.number-overlay {
+  position: absolute;
+  left: 40%;
+  top: 40%;
+  font: 3em bold;
+  z-index: 1;
+  color: white;
+  visibility: hidden;
+}
+
+.tile-numbers > .tile-wrapper > .number-overlay {
+  visibility: visible;
+}

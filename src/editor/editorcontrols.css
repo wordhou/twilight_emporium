@@ -1,13 +1,18 @@
-.boardControls {
+.editorControls {
   background: yellow;
 }
 
-.board-controls-wrapper {
+.mapInfo {
+  display: block;
+  background: limegreen;
+}
+
+.editor-controls-wrapper {
   display: flex;
   flex-flow: row nowrap;
 }
 
-.board-controls-button {
+.editor-controls-button {
   display: block;
 
   font-size: 1.5em;
@@ -19,6 +24,6 @@
   color: white;
 }
 
-.board-controls-button.inactive {
+.editor-controls-button.inactive {
   background-color: grey;
 }

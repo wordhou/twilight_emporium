@@ -6,8 +6,15 @@ import Tiles from "../lib/tiles";
 import data from "../data.json";
 import Component from "../lib/component";
 import { IComponent } from "../lib/component";
-import { EditorState, EditorStateUpdate, transitions } from "./editorstate";
+import {
+  EditorComponentUpdate,
+  EditorState,
+  EditorStateUpdate,
+  transitions,
+} from "./editorstate";
 import TileSelector from "./tileselector";
+import EditorControls from "./editorcontrols";
+import "./editor.css";
 
 interface Settings {
   initial?: TwilightMap;
@@ -35,6 +42,7 @@ class Editor {
         dropTarget: [],
       });
     this.components = {
+      editorControls: new EditorControls(this),
       tileSelector: new TileSelector(this),
       boardView: new BoardView(this),
       //generatorPane: new Component(),
@@ -44,22 +52,30 @@ class Editor {
   render(target: HTMLElement): void {
     this.target = target;
     target.innerHTML = `
-    <div class="tileSelector"></div>
-    <div class="boardView"></div>
-    <div class="generatorPane"></div>`;
+    <div class="editorControls"></div>
+    <div class="editor-main">
+      <div class="boardView"></div>
+      <div class="editor-main-sidebar">
+        <div class="generatorPane"></div>
+        <div class="tileSelector"></div>
+      </div>
+      </div>
+    </div>
+    `;
     this.nodes = Component.attachComponentsToNodes(this.components, target);
 
     this._addEventListeners();
   }
 
-  get current(): TwilightMap {
-    return this.editHistory.current;
+  update(updated: EditorComponentUpdate): void {
+    for (const comp in updated) {
+      const component = this.components[comp];
+      if (component.update !== undefined) component.update(updated[comp]);
+    }
   }
 
-  get unusedTiles(): TileNameSet {
-    const unusedTiles = new Set(Object.keys(data.tiles));
-    for (const t of this.current.board) unusedTiles.delete(Tiles.getName(t));
-    return unusedTiles;
+  get current(): TwilightMap {
+    return this.editHistory.current;
   }
 
   _initializeEditHistory(init?: TwilightMap): EditHistory<TwilightMap> {
@@ -69,6 +85,7 @@ class Editor {
 
   _addEventListeners(): Result<void> {
     const board = this.components.boardView.nodes.boardWrapper;
+    const unusedTiles = this.components.tileSelector.nodes.tilesWrapper;
     board.addEventListener("click", (ev) => {
       const index = getIndex(ev);
       if (index === null) {
@@ -80,11 +97,28 @@ class Editor {
     });
 
     board.addEventListener("dragstart", (ev) => {
-      const index = getIndex(ev);
-      if (index === null) return false;
-      (ev.dataTransfer as DataTransfer).dropEffect = "move";
-      this.runState(transitions.dragTile(index));
+      const el = ev.target;
+      if (
+        !(el instanceof HTMLElement) ||
+        !el.classList.contains("tile-wrapper")
+      )
+        return null;
       ev.stopPropagation();
+      const index = parseInt(el.dataset.i as string) as number;
+      this.runState(transitions.dragBoardTile(index));
+      (ev.dataTransfer as DataTransfer).dropEffect = "move";
+    });
+
+    unusedTiles.addEventListener("dragstart", (ev) => {
+      const el = ev.target;
+      console.log(el);
+      if (!(el instanceof HTMLElement) || !el.classList.contains("unused-tile"))
+        return null;
+      ev.stopPropagation();
+      const name = el.dataset.name as string;
+      const tile = Tiles.fromTTSString(name) as number;
+      this.runState(transitions.dragUnusedTile(tile));
+      (ev.dataTransfer as DataTransfer).dropEffect = "move";
     });
 
     board.addEventListener("dragover", (ev) => {
@@ -106,19 +140,42 @@ class Editor {
       this.runState(transitions.dropOnTile(index));
     });
 
+    this.target.addEventListener("dragend", (ev) => {
+      ev.preventDefault();
+      this.runState(transitions.dragEndDocument);
+    });
+
     this.target.addEventListener("rotateTile", (ev) => {
-      if ((ev as CustomEvent).detail === "cw")
-        this.runState(transitions.clickRotate(1));
-      if ((ev as CustomEvent).detail === "ccw")
-        this.runState(transitions.clickRotate(5));
+      if (!(ev instanceof CustomEvent)) return;
+      if (ev.detail === "cw") this.runState(transitions.clickRotate(1));
+      if (ev.detail === "ccw") this.runState(transitions.clickRotate(5));
       ev.stopPropagation();
     });
 
-    this.target.addEventListener;
+    this.target.addEventListener("resetRotation", (ev) => {
+      this.runState(transitions.clickResetTiles);
+      ev.stopPropagation();
+    });
 
-    board.addEventListener("dragend", (ev) => {
-      ev.preventDefault();
-      this.runState(transitions.dragEndDocument);
+    this.target.addEventListener("undoEdit", (ev) => {
+      this.editHistory.undo();
+      this.state = { name: "idle", dropTarget: [], selection: [] };
+      this.update({
+        tileSelector: { all: true },
+        boardView: ["tileControls", "allIndices"],
+      });
+      ev.stopPropagation();
+    });
+
+    this.target.addEventListener("redoEdit", (ev) => {
+      this.state = { name: "idle", dropTarget: [], selection: [] };
+      ev.stopPropagation();
+      const tiles = this.editHistory.redo();
+      if (tiles instanceof Error) return false;
+      this.update({
+        tileSelector: { all: true },
+        boardView: ["tileControls", "allIndices"],
+      });
     });
   }
 
@@ -130,11 +187,7 @@ class Editor {
     const { edit, updated } = stateUpdate;
     this.state = stateUpdate;
     if (edit !== undefined) this.editHistory.add(edit);
-    if (updated === undefined) return;
-    for (const comp in updated) {
-      const component = this.components[comp];
-      if (component.update !== undefined) component.update(updated[comp]);
-    }
+    if (updated !== undefined) this.update(updated);
   }
 }
 

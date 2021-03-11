@@ -1,0 +1,9 @@
+.tilesWrapper {
+  display: flex;
+  flex-flow: row wrap;
+  overflow-y: scroll;
+}
+
+.unused-tile > img {
+  pointer-events: none;
+}
