@@ -1,6 +1,6 @@
 import { Maybe, Result, TileIndex, TileNameSet } from "../types";
 import { EditHistory } from "../lib/chain";
-import TwilightMap from "../lib/twilightmap";
+import TIMapArray from "../lib/twilightmap";
 import BoardView from "./boardview";
 import Tiles from "../lib/tiles";
 import data from "../data.json";
@@ -17,7 +17,7 @@ import EditorControls from "./editorcontrols";
 import "./editor.css";
 
 interface Settings {
-  initial?: TwilightMap;
+  initial?: TIMapArray;
 }
 
 interface Editor extends Settings {}
@@ -25,7 +25,7 @@ interface Editor extends Settings {}
 class Editor {
   target!: HTMLElement;
   state: EditorState; // UI state of the editor
-  editHistory: EditHistory<TwilightMap>; // map state
+  editHistory: EditHistory<TIMapArray>; // map state
   nodes!: Record<string, HTMLElement>;
   components!: {
     boardView: BoardView;
@@ -74,12 +74,12 @@ class Editor {
     }
   }
 
-  get current(): TwilightMap {
+  get current(): TIMapArray {
     return this.editHistory.current;
   }
 
-  _initializeEditHistory(init?: TwilightMap): EditHistory<TwilightMap> {
-    const initState = init === undefined ? new TwilightMap(4) : init;
+  _initializeEditHistory(init?: TIMapArray): EditHistory<TIMapArray> {
+    const initState = init === undefined ? new TIMapArray(4) : init;
     return new EditHistory(initState);
   }
 

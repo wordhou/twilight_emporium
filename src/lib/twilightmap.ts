@@ -6,7 +6,7 @@ const SPACES = [1, 7, 19, 37, 61, 91, 127, 169, 217, 271]; // SPACES[n] = 3n(n+1
 const MAX_RINGS = SPACES.length;
 const MAX_TILE_INDEX = SPACES[MAX_RINGS - 1] - 1;
 
-class TwilightMap implements State {
+class TIMapArray implements State {
   rings: number;
   board: Uint16Array;
   constructor(input: number | Uint16Array) {
@@ -24,7 +24,7 @@ class TwilightMap implements State {
     }
   }
   clone(): this {
-    return new TwilightMap(this.board) as this;
+    return new TIMapArray(this.board) as this;
   }
 
   get size(): number {
@@ -145,7 +145,7 @@ class TwilightMap implements State {
     return [];
   }
 
-  static fromTTSString(tts: string): Result<TwilightMap> {
+  static fromTTSString(tts: string): Result<TIMapArray> {
     const ttsTiles = tts.split(" "); // TODO what if they use commas?
     if (!/18(-[0-5])?/.test(ttsTiles[0])) ttsTiles.unshift("18");
     const board = new Uint16Array(ttsTiles.length);
@@ -154,8 +154,8 @@ class TwilightMap implements State {
       if (tile instanceof Error) return tile;
       board[i] = tile;
     }
-    return new TwilightMap(board);
+    return new TIMapArray(board);
   }
 }
 
-export default TwilightMap;
+export default TIMapArray;

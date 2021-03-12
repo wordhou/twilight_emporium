@@ -1,6 +1,6 @@
 import { Result, Tile, TileIndex } from "../types";
 import { EditHistory } from "../lib/chain";
-import TwilightMap from "../lib/twilightmap";
+import TIMapArray from "../lib/twilightmap";
 import * as Hex from "../lib/hex";
 import Tiles from "../lib/tiles";
 import { EditorState } from "./editorstate";
@@ -42,11 +42,11 @@ class BoardView extends Component {
   topOffset!: number;
   leftOffset!: number;
 
-  get current(): TwilightMap {
+  get current(): TIMapArray {
     return this.editHistory.current;
   }
 
-  get editHistory(): EditHistory<TwilightMap> {
+  get editHistory(): EditHistory<TIMapArray> {
     return this.editor.editHistory;
   }
 

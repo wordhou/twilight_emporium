@@ -1,10 +1,10 @@
 import { Edit, CorruptedStateError, InvalidEditError } from "../lib/chain";
-import TwilightMap from "../lib/twilightmap";
+import TIMapArray from "../lib/twilightmap";
 import { Result, TileIndex, Tile, MapSection } from "../types";
 
 type TileIndices = Iterable<TileIndex>;
 
-class SetTiles implements Edit<TwilightMap> {
+class SetTiles implements Edit<TIMapArray> {
   oldTiles: MapSection | undefined;
   newTiles: MapSection;
   _reversible: boolean;
@@ -13,7 +13,7 @@ class SetTiles implements Edit<TwilightMap> {
     this.newTiles = sec;
   }
 
-  forward(st: TwilightMap): Result<TileIndices> {
+  forward(st: TIMapArray): Result<TileIndices> {
     const sel = new Set(this.newTiles.keys());
     const sec = st.getMapSection(sel);
     if (sec instanceof Error) return new InvalidEditError();
@@ -24,7 +24,7 @@ class SetTiles implements Edit<TwilightMap> {
     return this.newTiles.keys();
   }
 
-  backward(st: TwilightMap): Result<TileIndices> {
+  backward(st: TIMapArray): Result<TileIndices> {
     if (this._reversible !== true)
       return new InvalidEditError(
         "Can't reverse setTiles before it's been performed"
@@ -39,7 +39,7 @@ class SetTiles implements Edit<TwilightMap> {
   }
 }
 
-class SetTile implements Edit<TwilightMap> {
+class SetTile implements Edit<TIMapArray> {
   oldTile: Tile | undefined;
   newTile: Tile;
   index: TileIndex;
@@ -50,7 +50,7 @@ class SetTile implements Edit<TwilightMap> {
     this._reversible = false;
   }
 
-  forward(st: TwilightMap): Result<TileIndices> {
+  forward(st: TIMapArray): Result<TileIndices> {
     const t = st.getTile(this.index);
     if (t instanceof Error) return new InvalidEditError(t.message);
     this.oldTile = t;
@@ -60,7 +60,7 @@ class SetTile implements Edit<TwilightMap> {
     return [this.index];
   }
 
-  backward(st: TwilightMap): Result<TileIndices> {
+  backward(st: TIMapArray): Result<TileIndices> {
     if (this._reversible !== true) return new InvalidEditError();
     const err = st.setTile(this.oldTile as Tile, this.index);
     if (err instanceof Error) return err;
@@ -72,7 +72,7 @@ class SetTile implements Edit<TwilightMap> {
   }
 }
 
-class SwapTiles implements Edit<TwilightMap> {
+class SwapTiles implements Edit<TIMapArray> {
   i: TileIndex;
   j: TileIndex;
 
@@ -81,13 +81,13 @@ class SwapTiles implements Edit<TwilightMap> {
     this.j = j;
   }
 
-  forward(st: TwilightMap): Result<TileIndices> {
+  forward(st: TIMapArray): Result<TileIndices> {
     const err = st.swapTiles(this.i, this.j);
     if (err instanceof Error) return err;
     return [this.i, this.j];
   }
 
-  backward(st: TwilightMap): Result<TileIndices> {
+  backward(st: TIMapArray): Result<TileIndices> {
     return this.forward(st);
   }
 
@@ -96,20 +96,20 @@ class SwapTiles implements Edit<TwilightMap> {
   }
 }
 
-class SwapManyTiles implements Edit<TwilightMap> {
+class SwapManyTiles implements Edit<TIMapArray> {
   pairs: [TileIndex, TileIndex][];
 
   constructor(pairs: [TileIndex, TileIndex][]) {
     this.pairs = pairs;
   }
 
-  forward(st: TwilightMap): Result<TileIndices> {
+  forward(st: TIMapArray): Result<TileIndices> {
     const err = st.swapManyTiles(this.pairs);
     if (err instanceof CorruptedStateError) return err;
     return this.pairs.flat();
   }
 
-  backward(st: TwilightMap): Result<TileIndices> {
+  backward(st: TIMapArray): Result<TileIndices> {
     return this.forward(st);
   }
 
@@ -118,7 +118,7 @@ class SwapManyTiles implements Edit<TwilightMap> {
   }
 }
 
-class RotateTile implements Edit<TwilightMap> {
+class RotateTile implements Edit<TIMapArray> {
   index: number;
   rotation: number;
 
@@ -127,13 +127,13 @@ class RotateTile implements Edit<TwilightMap> {
     this.rotation = rotation;
   }
 
-  forward(st: TwilightMap): Result<TileIndices> {
+  forward(st: TIMapArray): Result<TileIndices> {
     const err = st.rotateTile(this.rotation, this.index);
     if (err instanceof CorruptedStateError) return err;
     return [this.index];
   }
 
-  backward(st: TwilightMap): Result<TileIndices> {
+  backward(st: TIMapArray): Result<TileIndices> {
     const err = st.rotateTile(-this.rotation, this.index);
     if (err instanceof CorruptedStateError) return err;
     return [this.index];
@@ -144,7 +144,7 @@ class RotateTile implements Edit<TwilightMap> {
   }
 }
 
-class ResetTiles implements Edit<TwilightMap> {
+class ResetTiles implements Edit<TIMapArray> {
   selection: Iterable<TileIndex>;
   oldTiles?: MapSection;
   _reversible: boolean;
@@ -154,7 +154,7 @@ class ResetTiles implements Edit<TwilightMap> {
     this._reversible = false;
   }
 
-  forward(st: TwilightMap): Result<TileIndices> {
+  forward(st: TIMapArray): Result<TileIndices> {
     const sec = st.getMapSection(this.selection);
     if (sec instanceof Error) return new InvalidEditError();
     this.oldTiles = sec;
@@ -168,7 +168,7 @@ class ResetTiles implements Edit<TwilightMap> {
     return this._reversible;
   }
 
-  backward(st: TwilightMap): Result<TileIndices> {
+  backward(st: TIMapArray): Result<TileIndices> {
     if (this._reversible !== true)
       return new InvalidEditError(
         "Can't reverse resetTiles before it's been performed"

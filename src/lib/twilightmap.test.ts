@@ -1,3 +1,3 @@
-import TwilightMap from "./twilightmap";
+import TIMapArray from "./twilightmap";
 
 test.todo("");

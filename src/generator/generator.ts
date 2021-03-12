@@ -1,7 +1,7 @@
 import { Result } from "../types";
 import { Reset } from "../lib/chain";
 import Shape from "../lib/shape";
-import TwilightMap from "../lib/twilightmap";
+import TIMapArray from "../lib/twilightmap";
 
 type Settings = {
   value: number;

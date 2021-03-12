@@ -5,7 +5,7 @@ import * as util from "../lib/util";
 import * as Hex from "../lib/hex";
 import { BoardViewUpdate } from "./boardview";
 import { TileSelectorUpdate } from "./tileselector";
-import TwilightMap from "../lib/twilightmap";
+import TIMapArray from "../lib/twilightmap";
 import { IComponent } from "../lib/component";
 
 const editorStateNames = ["idle", "selection", "dragging"] as const;
@@ -27,7 +27,7 @@ export interface EditorComponentUpdate {
 
 interface EditorStateUpdate extends EditorState {
   updated?: EditorComponentUpdate;
-  edit?: Edit<TwilightMap>;
+  edit?: Edit<TIMapArray>;
 }
 
 type Transition = (st: EditorState) => EditorStateUpdate | undefined;

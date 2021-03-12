@@ -1,7 +1,7 @@
 import sharp from "sharp";
 import * as fs from "fs";
 import * as Hex from "../lib/hex";
-import TwilightMap from "../lib/twilightmap";
+import TIMapArray from "../lib/twilightmap";
 import Tiles from "../lib/tiles";
 import { rotation } from "../types";
 
@@ -68,7 +68,7 @@ class MapCompositor {
 
   async drawTTSMap(tts: string, output: string): Promise<void> {
     if (this.ready === false) throw new Error(`MapCompositor not initiated`);
-    const map = TwilightMap.fromTTSString(tts);
+    const map = TIMapArray.fromTTSString(tts);
     if (map instanceof Error) return;
     const boardWidth = this.tileWidth * (1 + 1.5 * map.rings);
     const boardHeight = this.tileHeight * (1 + 2 * map.rings);
