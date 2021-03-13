@@ -2,11 +2,40 @@
 <html>
   <head>
   <%- include('../partials/head'); %>
+  <script type="text/javascript" src="../map.js"></script>
   </head>
   <body>
   <header><%- include('../partials/header'); %></header>
-    <h2><%= map.name %></h2>
-    <img src="<%- map.img_src() %>">
+
+    <section class="map">
+      <header class="section-map-header">
+      <h2>Twilight Emperium Map Name: <%= map.map_name; %></h2>
+      <h3>Author: <%= map.author.display_name %></h3>
+      </header>
+
+      <div class="map-image-wrapper">
+      <img src="/api/maps/<%= map.map_id %>/latest/large.jpg">
+      </div>
+
+      <section class="map-description">
+        Map description: <%= map.description; %>
+      </section>
+    </section>
+    <section class="map-comments">
+      <% map.comments.forEach( comment => { %>
+      <h1> Posted by <%= comment.user.display_name %> </h1>
+      <h2> on <%= comment.created %> </h2>
+      <%= comment.text %>
+      <% }); %>
+    </section>
+    <section class="new-reply map-comments">
+      <form action="/api/maps/<%= map.map_id %>/comments" method="post">
+        <label for="text">Text:</label>
+        <textarea id="text" name="text"></textarea>
+        <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
+        <button>submit</button>
+      </form>
+    </section>
   </body>
   <footer>
   <%- include('../partials/footer'); %>

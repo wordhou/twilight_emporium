@@ -15,11 +15,7 @@ module.exports = {
       },
       {
         test: /\.(css)$/i,
-        use: [
-          //MiniCssExtractPlugin.loader,
-          "style-loader",
-          "css-loader",
-        ],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
@@ -47,7 +43,7 @@ module.exports = {
     extensions: [".ts", ".js"],
   },
   plugins: [
-    //new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin(),
     new CopyPlugin({
       patterns: [{ from: "public", to: "dist" }],
     }),
@@ -61,12 +57,13 @@ module.exports = {
     }),
   ],
   output: {
-    filename: "main.js",
+    filename: "editor.js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     clean: true,
   },
   devServer: {
     contentBase: path.resolve(__dirname, "public"),
+    writeToDisk: true,
   },
 };

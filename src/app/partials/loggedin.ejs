@@ -1,0 +1,6 @@
+<% if (user) { %>
+<p>Logged in as <%= user.display_name %></p>
+<p><a href="/auth/logout">Log out</a></p>
+  <% } else {%>
+  <a href="/auth?redirect=<%= redirect %>"> Log in </a>
+<% }%>

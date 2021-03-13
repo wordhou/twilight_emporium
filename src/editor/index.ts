@@ -11,7 +11,7 @@ const editor = new Editor({
   initial: tm,
 });
 
-editor.render(document.querySelector("main") as HTMLElement);
+editor.render(document.getElementById("editor-app") as HTMLElement);
 
 // DEBUG
 //
