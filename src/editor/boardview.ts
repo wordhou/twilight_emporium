@@ -11,16 +11,22 @@ import "./boardview.css";
 import BoardControls from "./boardcontrols";
 
 type TileSelection = Iterable<number>;
-export type UpdatableElem = "tileControls" | "allIndices" | "boardSize";
+export type UpdatableElem =
+  | "tileControls"
+  | "allIndices"
+  | "mapSize"
+  | "tileSize";
 export type BoardViewUpdate = Iterable<number | UpdatableElem>;
 
 interface Settings {
+  sizeFactor: number;
   tileHeight: number;
   tileWidth: number;
   tileNumberOverlay: boolean;
 }
 
 const DEFAULT_SETTINGS: Settings = {
+  sizeFactor: 1,
   tileWidth: 364,
   tileHeight: 317,
   tileNumberOverlay: false,
@@ -58,9 +64,12 @@ class BoardView extends Component {
     super();
     this.editor = editor;
     this.tileWrappers = [];
-    this.tileWidth = settings.tileWidth;
-    this.tileHeight = settings.tileHeight;
-    this.tileNumberOverlay = settings.tileNumberOverlay;
+    this.tileWidth = settings.tileWidth || DEFAULT_SETTINGS.tileWidth;
+    this.tileHeight = settings.tileHeight || DEFAULT_SETTINGS.tileHeight;
+    this.sizeFactor = settings.sizeFactor || DEFAULT_SETTINGS.sizeFactor;
+    this.tileNumberOverlay =
+      settings.tileNumberOverlay || DEFAULT_SETTINGS.tileNumberOverlay;
+    console.log(this.tileHeight, this.tileWidth);
     this.components = {
       tileControls: new TileControls(this),
       boardControls: new BoardControls(this),
@@ -97,20 +106,48 @@ class BoardView extends Component {
       if (i === "tileControls") this.components.tileControls.update();
       if (i === "allIndices")
         this.current.board.forEach((t, i) => this._drawTile(t, i));
+      if (i === "mapSize") {
+        const newLen = this.current.board.length;
+        const curLen = this.tileWrappers.length;
+        if (curLen < newLen) {
+          for (let i = curLen; i < newLen; i++) this._addTileWrapper(i);
+        }
+        if (curLen > newLen) {
+          for (let i = newLen; i < curLen; i++) this.tileWrappers[i].remove();
+          this.tileWrappers = this.tileWrappers.slice(0, newLen);
+        }
+        this._setBoardSizes();
+        this._style();
+      }
+      if (i === "tileSize") {
+        this._setBoardSizes();
+        this._style();
+        this.tileWrappers.forEach((_, i) => this._styleTileWrapper(i));
+      }
     }
   }
 
   _addEventListeners(): void {
     this.target.addEventListener("toggleNumbers", (ev) => {
       this.tileNumberOverlay = !this.tileNumberOverlay;
-      this.style();
+      this._style();
+      ev.stopPropagation();
+    });
+    this.target.addEventListener("zoomIn", (ev) => {
+      this.sizeFactor *= 1.25;
+      this.update(["tileSize"]);
+      ev.stopPropagation();
+    });
+    this.target.addEventListener("zoomOut", (ev) => {
+      this.sizeFactor *= 0.8;
+      this.update(["tileSize"]);
       ev.stopPropagation();
     });
   }
 
   _drawBoard(): void {
-    this._computeOffsets();
-    this.style();
+    this._setBoardSizes();
+    this._style();
 
     this.current.board.forEach((t, i) => {
       if (i >= this.tileWrappers.length) this._addTileWrapper(i);
@@ -118,15 +155,16 @@ class BoardView extends Component {
     });
   }
 
-  _computeOffsets(): void {
+  _setBoardSizes(): void {
     const r = this.current.rings;
-    this.boardWidth = this.tileWidth * (1 + 1.5 * r);
-    this.boardHeight = this.tileHeight * (1 + 2 * r);
-    this.topOffset = 0.5 * this.boardHeight - 0.5 * this.tileHeight;
-    this.leftOffset = 0.5 * this.boardWidth - 0.5 * this.tileWidth;
+    const [sf, tw, th] = [this.sizeFactor, this.tileWidth, this.tileHeight];
+    this.boardWidth = sf * tw * (1 + 1.5 * r);
+    this.boardHeight = sf * th * (1 + 2 * r);
+    this.topOffset = 0.5 * this.boardHeight - 0.5 * sf * th;
+    this.leftOffset = 0.5 * this.boardWidth - 0.5 * sf * tw;
   }
 
-  style(): Result<void> {
+  _style(): Result<void> {
     const bw = this.nodes.boardWrapper;
     bw.style.width = `${this.boardWidth}px`;
     bw.style.height = `${this.boardHeight}px`;
@@ -160,14 +198,28 @@ class BoardView extends Component {
     div.classList.add("tile-wrapper");
     div.setAttribute("draggable", "true");
     div.dataset.i = `${index}`;
-    const [x, y] = Hex.spiralToXY(index, this.tileWidth, this.tileHeight);
-    div.style.width = `${this.tileWidth}px`;
-    div.style.height = `${this.tileHeight}px`;
-    div.style.top = `${this.topOffset - y}px`;
-    div.style.left = `${this.leftOffset + x}px`;
     this.nodes.boardWrapper.appendChild(div);
     this.tileWrappers[index] = div;
+    this._styleTileWrapper(index);
     return div;
+  }
+
+  _styleTileWrapper(index: number): Result<void> {
+    if (index > this.tileWrappers.length)
+      return new Error(`Index out of range for tileWrappers`);
+    const div = this.tileWrappers[index];
+    const [sf, tw, th, to, lo] = [
+      this.sizeFactor,
+      this.tileWidth,
+      this.tileHeight,
+      this.topOffset,
+      this.leftOffset,
+    ];
+    const [x, y] = Hex.spiralToXY(index, sf * tw, sf * th);
+    div.style.width = `${sf * tw}px`;
+    div.style.height = `${sf * th}px`;
+    div.style.top = `${to - y}px`;
+    div.style.left = `${lo + x}px`;
   }
 }
 
