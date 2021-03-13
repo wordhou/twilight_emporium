@@ -1,6 +1,8 @@
 import Router from "express-promise-router";
 import { TwilightMap, User, MapComment } from "../models";
 
+const urlRoot = process.env["URL_ROOT"] || "localhost:3000";
+
 const router = Router();
 
 router.get("/helloworld", async (req, res) => {
@@ -17,13 +19,20 @@ router.get("/maps/:id", async (req, res) => {
   await map.populate();
   const user = req.user as User;
   const userOwnsMap = req.isAuthenticated() && user.user_id === map.user_id;
-  const redirect = req.path;
+  const redirect = req.originalUrl;
   console.log(req.path);
-  res.render("map", { map, user, userOwnsMap, redirect });
+  res.render("map", { map, user, urlRoot, userOwnsMap, redirect });
 });
 
 router.get("/editor", async (req, res) => {
-  res.render("editor", { user: req.user, redirect: req.path });
+  const map_id = req.query.map_id as string | undefined;
+  const user = req.user;
+  const redirect = req.originalUrl;
+  if (map_id === undefined) {
+  } else {
+    const map = await TwilightMap.get(map_id);
+    res.render("editor", { map, urlRoot, user, redirect });
+  }
 });
 
 /*

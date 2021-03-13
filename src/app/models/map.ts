@@ -76,6 +76,10 @@ class TwilightMap {
     return this;
   }
 
+  get latest(): string {
+    return this.versions[this.versions.length - 1];
+  }
+
   modify({
     map_name,
     description,
@@ -141,7 +145,8 @@ class TwilightMap {
     return map;
   }
 
-  static async get(id: number): Promise<TwilightMap> {
+  static async get(id: number | string): Promise<TwilightMap> {
+    if (typeof id === "string") id = parseInt(id);
     const result = await db.query(`select * from maps where map_id = $1`, [id]);
     if (result.rowCount === 0) throw new Error(`No map with map_id ${id}`);
     return new TwilightMap(result.rows[0]);

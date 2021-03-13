@@ -1,7 +1,5 @@
 const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: "./src/editor/index.ts",
@@ -34,7 +32,6 @@ module.exports = {
     clean: true,
   },
   devServer: {
-    contentBase: path.resolve(__dirname, "public"),
     writeToDisk: true,
   },
 };
