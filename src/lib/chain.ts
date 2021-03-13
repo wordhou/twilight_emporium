@@ -67,6 +67,9 @@ interface IEditHistory<S extends State> {
   redo: (steps?: number) => Result<void>;
 }
 
+const EDIT_HISTORY_MAX = 200;
+const EDIT_HISTORY_NEW = 100;
+
 /**
  * Maintains the current State of an object, as well as a history of edits to that object. Allows methods to traverse through the history of the object via undo, redo and jump.
  */
@@ -100,6 +103,12 @@ class EditHistory<S extends State> implements IEditHistory<S> {
       this.states.push(this._top.clone());
       ed.forward(this._top);
       this.index++;
+    }
+
+    if (this.states.length === EDIT_HISTORY_MAX) {
+      const reduction = EDIT_HISTORY_MAX - EDIT_HISTORY_NEW;
+      this.states = this.states.slice(reduction);
+      this.index -= reduction;
     }
   }
 

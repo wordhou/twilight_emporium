@@ -1,15 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-  <script>
-      const map = <% JSON.stringify(map) %>
+  <script defer>
+          window.__INIT__ = { 
+            map_id: <%- map_id || "undefined" %>,
+            userData: <%- user ? JSON.stringify(user) : "undefined" %>,
+            mapData: <%- map ? JSON.stringify(map) : "undefined" %>,
+          };
   </script>
   <%- include('../partials/head'); %>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="editor.js" defer></script>
     <link rel="stylesheet" href="editor.css">
-  </head>
+  </head
   <body>
   <header><%- include('../partials/header'); %></header>
     <main id="editor-app"></main>

@@ -1,10 +1,10 @@
-import { Maybe, Result, TileIndex, TileNameSet } from "../types";
+import { Maybe, Result, TileIndex } from "../types";
 import { EditHistory } from "../lib/chain";
 import TIMapArray from "../lib/twilightmap";
 import BoardView from "./boardview";
 import Tiles from "../lib/tiles";
-import data from "../data.json";
 import Component from "../lib/component";
+import Api from "./api";
 import { IComponent } from "../lib/component";
 import {
   EditorComponentUpdate,
@@ -15,9 +15,13 @@ import {
 import TileSelector from "./tileselector";
 import EditorControls from "./editorcontrols";
 import "./editor.css";
+import { MapData } from "../app/models/map";
+import { UserData } from "../app/models/user";
 
 interface Settings {
   initial?: TIMapArray;
+  mapData: MapData;
+  userData: UserData;
 }
 
 interface Editor extends Settings {}
@@ -35,12 +39,14 @@ class Editor {
   };
 
   constructor(s: Settings) {
-    (this.editHistory = this._initializeEditHistory(s.initial)),
-      (this.state = {
-        name: "idle",
-        selection: [],
-        dropTarget: [],
-      });
+    this.editHistory = this._initializeEditHistory(s.initial);
+    this.mapData = s.mapData;
+    this.userData = s.userData;
+    this.state = {
+      name: "idle",
+      selection: [],
+      dropTarget: [],
+    };
     this.components = {
       editorControls: new EditorControls(this),
       tileSelector: new TileSelector(this),

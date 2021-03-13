@@ -20,7 +20,9 @@ class TIMapArray implements State {
       for (let i = 0; i < input.length; i++) this.board[i] = input[i];
     } else {
       this.rings = input;
-      this.board = new Uint16Array(1 + 3 * this.rings * (this.rings + 1));
+      this.board = new Uint16Array(1 + 3 * this.rings * (this.rings + 1)).fill(
+        0
+      );
     }
   }
   clone(): this {
@@ -143,6 +145,14 @@ class TIMapArray implements State {
   getAdjacencyLists(): number[][] {
     // TODO
     return [];
+  }
+
+  toTTSString(): string {
+    const tiles =
+      Tiles.getNumber(this.board[0]) === 18
+        ? Array.from(this.board.slice(1))
+        : Array.from(this.board);
+    return tiles.map((t) => Tiles.toTTSString(t)).join(" ");
   }
 
   static fromTTSString(tts: string): Result<TIMapArray> {

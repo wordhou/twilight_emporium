@@ -2,7 +2,7 @@ import db from "../db";
 import Comment from "./comment";
 import User from "./user";
 
-interface MapData {
+export interface MapData {
   map_id?: number;
   created?: string;
   user_id: number;

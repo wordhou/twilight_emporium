@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@types/express-promise-router": "^3.0.0",
+    "@types/jquery": "^3.5.5",
     "@types/method-override": "^0.0.31",
     "cookie-parser": "^1.4.5",
     "ejs": "^3.1.6",
@@ -64,6 +65,7 @@
     "express": "^4.17.1",
     "express-promise-router": "^4.0.1",
     "express-session": "^1.17.1",
+    "jquery": "^3.6.0",
     "method-override": "^3.0.0",
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",

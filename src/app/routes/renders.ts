@@ -28,11 +28,14 @@ router.get("/editor", async (req, res) => {
   const map_id = req.query.map_id as string | undefined;
   const user = req.user;
   const redirect = req.originalUrl;
-  if (map_id === undefined) {
-  } else {
-    const map = await TwilightMap.get(map_id);
-    res.render("editor", { map, urlRoot, user, redirect });
-  }
+  const map = map_id === undefined ? undefined : await TwilightMap.get(map_id);
+  res.render("editor", {
+    map_id,
+    map,
+    user,
+    urlRoot,
+    redirect,
+  });
 });
 
 /*
