@@ -23,18 +23,37 @@
     </section>
     <section class="map-comments">
       <% map.comments.forEach( comment => { %>
-      <h1> Posted by <%= comment.user.display_name %> </h1>
-      <h2> on <%= comment.created %> </h2>
-      <%= comment.text %>
+        <div id="comment-<%= comment.comment_id%>">
+        <h1> Posted by <%= comment.user.display_name %> </h1>
+        <h2> on <%= comment.created %> </h2>
+        <%= comment.text %>
+        <% if ( user && user.user_id === comment.user_id ) { %>
+          <a href="#" onclick="toggleEdit(<%= comment.comment_id %>)"> Edit </a>
+          <div class="comment-edit">
+            <form action="/api/maps/<%= map.map_id %>/comments/<%= comment.comment_id %>" method="get">
+              <label for="text">Text:</label>
+              <textarea id="text" name="text"></textarea>
+              <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
+              <input type="hidden" name="_method" value="post" />
+              <button>submit</button>
+            </form>
+          </div>
+        <% } %>
+      </div>
       <% }); %>
     </section>
+
     <section class="new-reply map-comments">
+      <% if ( user ) { %>
       <form action="/api/maps/<%= map.map_id %>/comments" method="post">
         <label for="text">Text:</label>
         <textarea id="text" name="text"></textarea>
         <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
         <button>submit</button>
       </form>
+      <% } else { %>
+      <a href="/auth?redirect=<%= redirect %>">Log in</a> to post comments.
+      <% } %>
     </section>
   </body>
   <footer>

@@ -1,4 +1,3 @@
-import "bootstrap-icons/font/bootstrap-icons.css";
 import "./tilecontrols.css";
 import Component from "../lib/component";
 import BoardView from "./boardview";

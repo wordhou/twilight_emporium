@@ -6,8 +6,7 @@ authRouter.get(
   "/auth",
   (req, res, next) => {
     (req.session as any).redirect = req.query.redirect;
-    (req.session as any).body = req.body;
-    (req.session as any).query = req.query;
+    console.log(req.query.redirect);
     next();
   },
   passport.authenticate("google", { scope: ["profile", "email"] })

@@ -12,27 +12,13 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    (req.session as any).redirect = req.originalUrl;
-    res.redirect("/auth");
-    //res.status(403).send("Must be logged in to continue");
+    // (req.session as any).redirect = req.originalUrl;
+    let redirect;
+    if (req.params.redirect) redirect = req.params.redirect;
+    if (req.body.redirect) redirect = req.body.redirect;
+    res.redirect(`/auth?redirect=${redirect}`);
   }
 };
-
-api.get("/test", async (req, res) => {
-  res.json({
-    query: req.query,
-    header: req.header,
-    user: req.user,
-    test: true,
-  });
-});
-api.post("/test", async (req, res) => {
-  res.json({
-    body: req.body,
-    user: req.user,
-    test: true,
-  });
-});
 
 api.post("/maps", requireAuth, async (req, res) => {
   const { map_name, description } = req.body;
@@ -56,17 +42,26 @@ api.get("/maps/:id/latest/large.jpg", async (req, res) => {
   res.type("jpg").send(jpg);
 });
 
+api.get("/maps/:id/latest/small.jpg", async (req, res) => {
+  const map_id = parseInt(req.params.id);
+  const map = await TwilightMap.get(map_id);
+  const latest = map.versions[map.versions.length - 1];
+  const jpg = await compositor.drawTTSMap(latest, 300);
+  res.type("jpg").send(jpg);
+});
+
 api.put("/maps/:id", requireAuth, async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
-  const { newVersion, map_name, description } = req.body;
+  const { newVersion, map_name, description, redirect } = req.body;
   if (map_name !== undefined || description !== undefined) {
     if (newVersion !== undefined) map.versions.push(newVersion);
     await map.save();
   } else if (newVersion !== undefined) {
     await map.addVersion(newVersion);
   }
-  res.send(map.getData());
+  if (redirect !== undefined) res.redirect(redirect);
+  else res.json(map.getData());
 });
 
 api.post("/maps/:id/comments", requireAuth, async (req, res) => {

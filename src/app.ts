@@ -4,8 +4,10 @@ import routes from "./app/routes";
 import passport from "./app/passport";
 import session from "./app/session";
 import cookieParser from "cookie-parser";
+import methodOverride from "method-override";
 const app = express();
 
+app.use(methodOverride("_method"));
 app.set("views", path.join(__dirname, "app/views"));
 app.set("view engine", "ejs");
 

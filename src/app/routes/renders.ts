@@ -13,12 +13,12 @@ router.get("/helloworld", async (req, res) => {
 
 router.get("/maps/:id", async (req, res) => {
   const map_id = parseInt(req.params.id);
-  console.log("(renders.ts 16): req.params.id = ", req.params.id, map_id);
   const map = await TwilightMap.get(map_id);
   await map.populate();
   const user = req.user as User;
   const userOwnsMap = req.isAuthenticated() && user.user_id === map.user_id;
   const redirect = req.path;
+  console.log(req.path);
   res.render("map", { map, user, userOwnsMap, redirect });
 });
 
