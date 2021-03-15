@@ -182,7 +182,7 @@ class TwilightMap {
 
   static async createTable(): Promise<void> {
     await db.query(
-      `CREATE TABLE IF NOT EXISTS maps (
+      `CREATE TABLE maps (
           map_id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
           user_id INT,
           map_name VARCHAR(255) NOT NULL,
@@ -205,7 +205,6 @@ class TwilightMap {
   END;
   $$ language 'plpgsql';`
     );
-    await db.query(`DROP TRIGGER update_customer_modtime ON maps`);
     await db.query(
       `CREATE TRIGGER update_customer_modtime BEFORE UPDATE ON maps FOR EACH ROW EXECUTE PROCEDURE  update_modified_column();`
     );
