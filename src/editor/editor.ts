@@ -10,27 +10,38 @@ import {
   EditorComponentUpdate,
   EditorState,
   EditorStateUpdate,
-  transitions,
 } from "./editorstate";
+import StateTransitions from "./editorstate";
 import TileSelector from "./tileselector";
 import EditorControls from "./editorcontrols";
 import "./editor.css";
 import { MapData } from "../app/models/map";
 import { UserData } from "../app/models/user";
+import { Resize } from "./edits";
 
 interface Settings {
   initial?: TIMapArray;
-  mapData: MapData;
-  userData: UserData;
+  mapData?: MapData;
+  userData?: UserData;
 }
 
-interface Editor extends Settings {}
+const DEFAULT_SETTINGS = {
+  mapData: {
+    map_name: "New Twilight Imperium map",
+    description: "Map description",
+    versions: [],
+  },
+};
 
 class Editor {
   target!: HTMLElement;
   state: EditorState; // UI state of the editor
   editHistory: EditHistory<TIMapArray>; // map state
   nodes!: Record<string, HTMLElement>;
+  transitions: StateTransitions;
+  mapData: Partial<MapData>;
+  userData?: UserData;
+  api: Api;
   components!: {
     boardView: BoardView;
     tileSelector: TileSelector;
@@ -40,8 +51,10 @@ class Editor {
 
   constructor(s: Settings) {
     this.editHistory = this._initializeEditHistory(s.initial);
-    this.mapData = s.mapData;
+    this.mapData = s.mapData || DEFAULT_SETTINGS.mapData;
     this.userData = s.userData;
+    this.transitions = new StateTransitions();
+    this.api = new Api(this);
     this.state = {
       name: "idle",
       selection: [],
@@ -85,7 +98,7 @@ class Editor {
   }
 
   _initializeEditHistory(init?: TIMapArray): EditHistory<TIMapArray> {
-    const initState = init === undefined ? new TIMapArray(4) : init;
+    const initState = init === undefined ? new TIMapArray(3) : init;
     return new EditHistory(initState);
   }
 
@@ -95,10 +108,10 @@ class Editor {
     board.addEventListener("click", (ev) => {
       const index = getIndex(ev);
       if (index === null) {
-        this.runState(transitions.clickElsewhere);
+        this.runState(this.transitions.clickElsewhere);
         return;
       }
-      this.runState(transitions.clickTile(index));
+      this.runState(this.transitions.clickTile(index));
       ev.stopPropagation();
     });
 
@@ -111,7 +124,7 @@ class Editor {
         return null;
       ev.stopPropagation();
       const index = parseInt(el.dataset.i as string) as number;
-      this.runState(transitions.dragBoardTile(index));
+      this.runState(this.transitions.dragBoardTile(index));
       (ev.dataTransfer as DataTransfer).dropEffect = "move";
     });
 
@@ -123,7 +136,7 @@ class Editor {
       ev.stopPropagation();
       const name = el.dataset.name as string;
       const tile = Tiles.fromTTSString(name) as number;
-      this.runState(transitions.dragUnusedTile(tile));
+      this.runState(this.transitions.dragUnusedTile(tile));
       (ev.dataTransfer as DataTransfer).dropEffect = "move";
     });
 
@@ -135,7 +148,7 @@ class Editor {
       ev.preventDefault();
       const index = getIndex(ev);
       if (index === null) return false;
-      this.runState(transitions.dragEnterTile(index));
+      this.runState(this.transitions.dragEnterTile(index));
       ev.stopPropagation();
     });
 
@@ -143,45 +156,74 @@ class Editor {
       const index = getIndex(ev);
       if (index === null) return false;
       ev.preventDefault();
-      this.runState(transitions.dropOnTile(index));
+      this.runState(this.transitions.dropOnTile(index));
     });
 
     this.target.addEventListener("dragend", (ev) => {
       ev.preventDefault();
-      this.runState(transitions.dragEndDocument);
+      this.runState(this.transitions.dragEndDocument);
     });
 
     this.target.addEventListener("rotateTile", (ev) => {
       if (!(ev instanceof CustomEvent)) return;
-      if (ev.detail === "cw") this.runState(transitions.clickRotate(1));
-      if (ev.detail === "ccw") this.runState(transitions.clickRotate(5));
+      if (ev.detail === "cw") this.runState(this.transitions.clickRotate(1));
+      if (ev.detail === "ccw") this.runState(this.transitions.clickRotate(5));
       ev.stopPropagation();
     });
 
     this.target.addEventListener("resetRotation", (ev) => {
-      this.runState(transitions.clickResetTiles);
+      this.runState(this.transitions.clickResetTiles);
       ev.stopPropagation();
     });
 
     this.target.addEventListener("undoEdit", (ev) => {
+      if (this.editHistory.onBottom()) return;
       this.editHistory.undo();
       this.state = { name: "idle", dropTarget: [], selection: [] };
       this.update({
         tileSelector: { all: true },
-        boardView: ["tileControls", "allIndices"],
+        boardView: ["tileControls", "allIndices", "mapSize"],
+        editorControls: true,
       });
       ev.stopPropagation();
     });
 
     this.target.addEventListener("redoEdit", (ev) => {
+      if (this.editHistory.onTop()) return;
       this.state = { name: "idle", dropTarget: [], selection: [] };
       ev.stopPropagation();
       const tiles = this.editHistory.redo();
       if (tiles instanceof Error) return false;
       this.update({
         tileSelector: { all: true },
-        boardView: ["tileControls", "allIndices"],
+        boardView: ["tileControls", "allIndices", "mapSize"],
+        editorControls: true,
       });
+    });
+
+    this.target.addEventListener("addRing", (ev) => {
+      this.state = { name: "idle", dropTarget: [], selection: [] };
+      ev.stopPropagation();
+      this.editHistory.add(new Resize(1));
+      this.update({
+        boardView: ["tileControls", "mapSize"],
+        editorControls: true,
+      });
+    });
+
+    this.target.addEventListener("removeRing", (ev) => {
+      this.state = { name: "idle", dropTarget: [], selection: [] };
+      ev.stopPropagation();
+      this.editHistory.add(new Resize(-1));
+      this.update({
+        boardView: ["tileControls", "mapSize"],
+        editorControls: true,
+      });
+    });
+
+    this.target.addEventListener("saveMap", (ev) => {
+      ev.stopPropagation();
+      if (this.api.canSave()) this.runState(this.transitions.save(this.api));
     });
   }
 

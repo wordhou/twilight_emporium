@@ -179,4 +179,34 @@ class ResetTiles implements Edit<TIMapArray> {
   }
 }
 
-export { SetTiles, SetTile, SwapTiles, SwapManyTiles, RotateTile, ResetTiles };
+class Resize implements Edit<TIMapArray> {
+  oldTiles: MapSection | undefined;
+  rings: number;
+  _reversible: boolean;
+  constructor(rings: number) {
+    this._reversible = false;
+    this.rings = rings;
+  }
+
+  forward(st: TIMapArray): Result<void> {
+    return st.resize(st.rings + this.rings);
+  }
+
+  backward(st: TIMapArray): Result<void> {
+    return st.resize(st.rings - this.rings);
+  }
+
+  get reversible(): boolean {
+    return this._reversible;
+  }
+}
+
+export {
+  SetTiles,
+  SetTile,
+  SwapTiles,
+  SwapManyTiles,
+  RotateTile,
+  ResetTiles,
+  Resize,
+};

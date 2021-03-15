@@ -1,7 +1,13 @@
+.boardView {
+  overflow: scroll;
+  width: 80%;
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
 .boardWrapper {
   background-color: #eeeeee;
   position: relative;
-  border: thin lightgrey solid;
 }
 
 .tile-wrapper {
@@ -25,9 +31,8 @@
 
 .number-overlay {
   position: absolute;
-  left: 40%;
-  top: 40%;
-  font: 3em bold;
+  margin: auto;
+  font: bold 3em "Roboto", sans-serif;
   z-index: 1;
   color: white;
   visibility: hidden;

@@ -90,6 +90,10 @@ class EditHistory<S extends State> implements IEditHistory<S> {
     return this.index === this.states.length - 1;
   }
 
+  onBottom(): boolean {
+    return this.index === 0;
+  }
+
   get _top(): S {
     return this.states[this.states.length - 1];
   }
@@ -101,7 +105,11 @@ class EditHistory<S extends State> implements IEditHistory<S> {
       this.index++;
     } else {
       this.states.push(this._top.clone());
-      ed.forward(this._top);
+      const err = ed.forward(this._top);
+      if (err instanceof Error) {
+        this.states.pop();
+        return;
+      }
       this.index++;
     }
 

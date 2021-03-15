@@ -1,7 +1,7 @@
 import Router from "express-promise-router";
 import { TwilightMap, User, MapComment } from "../models";
 
-const urlRoot = process.env["URL_ROOT"] || "localhost:3000";
+const urlRoot = process.env["URL_ROOT"] || "http://localhost:3000";
 
 const router = Router();
 
@@ -38,12 +38,9 @@ router.get("/editor", async (req, res) => {
   });
 });
 
-/*
-router.get("/maps", (req, res) => {
-  // Get parameters from URL
-  // Use parameters to produce filtered and sorted list
-  // Render list
+router.get("/maps", async (req, res) => {
+  const maps = await TwilightMap.query();
+  res.render("maps", { maps, urlRoot });
 });
-*/
 
 export default router;

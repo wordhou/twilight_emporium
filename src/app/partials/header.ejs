@@ -1,10 +1,14 @@
-<h1> header </h1>
+<div class="title-line">
+<h1>Twilight Emporium</h1>
+<h2>Fan created maps and scenarios for Twilight Imperium IV</h2>
+</div>
 <nav>
-  <ul>
-    <li>Link</li>
-    <li>Link</li>
-  </ul>
-  <div class="login">
+  <ul class="nav-links">
+    <li><a href="<%=urlRoot%>/">Home</a></li>
+    <li><a href="<%=urlRoot%>/maps">Maps</a></li>
+    <li><a href="<%=urlRoot%>/editor">Editor</a></li>
+    <li><div class="login">
     <%- include("./loggedin.ejs"); %>
-  </div>
+      </div></li>
+  </ul>
 </nav>

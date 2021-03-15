@@ -13,10 +13,11 @@ export default class EditorControls extends Component {
     this.editor = editor;
     this.components = {
       mapInfo: this.info(),
-      undoEdit: this.button("", "Undo", "undoEdit"),
-      redoEdit: this.button("", "Redo", "redoEdit"),
-      saveMap: this.button("", "Save", "saveMap"),
-      newMap: this.button("", "New", "newMap"),
+      undoEdit: this.button("bi-caret-left-fill", "Undo", "undoEdit"),
+      redoEdit: this.button("bi-caret-right-fill", "Redo", "redoEdit"),
+      saveMap: this.button("bi-save2-fill", "Save", "saveMap"),
+      //newMap: this.button("", "New", "newMap"),
+      shareMap: this.button("bi-share-fill", "Share", "shareMap"),
     };
   }
 
@@ -29,6 +30,7 @@ export default class EditorControls extends Component {
       <div class="redoEdit"></div>
       <div class="saveMap"></div>
       <div class="newMap"></div>
+      <div class="shareMap"></div>
     </nav>
     `;
     this.nodes = Component.attachComponentsToNodes(
@@ -38,9 +40,28 @@ export default class EditorControls extends Component {
     this.style();
   }
 
+  update(i: boolean | "renderInfo"): void {
+    this.style();
+    if (i === "renderInfo") {
+      this.info().render(this.nodes.mapInfo);
+    }
+  }
+
   style(): void {
-    this.nodes.undoEdit.classList.toggle("inactive", false /*TODO*/);
-    this.nodes.redoEdit.classList.toggle("inactive", false /*TODO*/);
+    const saving = this.editor.state.name === "saving";
+    this.nodes.undoEdit.classList.toggle(
+      "inactive",
+      this.editor.editHistory.onBottom()
+    );
+    this.nodes.redoEdit.classList.toggle(
+      "inactive",
+      this.editor.editHistory.onTop()
+    );
+    this.nodes.mapInfo.classList.toggle("saving", saving);
+    this.nodes.saveMap.classList.toggle(
+      "inactive",
+      saving || !this.editor.api.canSave()
+    );
   }
 
   button(
@@ -67,8 +88,34 @@ export default class EditorControls extends Component {
   info(): Component {
     return {
       render: (t: HTMLElement) => {
+        const mapName = this.editor.mapData.map_name || "Untitled Map";
+
         t.innerHTML = `
-        <h1>file name</h1>: ${"helloworld"}`;
+        <h1>${mapName}</h1>
+        <a class="editMapName on">Edit name</a>
+        <span class="nameEditor">
+        <input class="mapNameInput" value="${mapName}"></input>
+        <a class="nameEditorSubmit">Done</a>
+        </span>
+        <span class="saving-indicator">Saving map...</span>
+        `;
+        const nodes = Component.getNodesByClass(
+          ["editMapName", "nameEditor", "nameEditorSubmit", "mapNameInput"],
+          t
+        );
+
+        nodes.editMapName.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          nodes.nameEditor.classList.toggle("on");
+          nodes.editMapName.classList.toggle("on");
+        });
+        nodes.nameEditorSubmit.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+          //nodes.nameEditor.classList.toggle("on");
+          //nodes.editMapName.classList.toggle("on");
+          this.editor.mapData.map_name = (nodes.mapNameInput as HTMLInputElement).value;
+          this.update("renderInfo");
+        });
       },
     };
   }

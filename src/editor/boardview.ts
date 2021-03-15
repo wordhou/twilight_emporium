@@ -16,7 +16,7 @@ export type UpdatableElem =
   | "allIndices"
   | "mapSize"
   | "tileSize";
-export type BoardViewUpdate = Iterable<number | UpdatableElem>;
+export type BoardViewUpdate = Array<number | UpdatableElem>;
 
 interface Settings {
   sizeFactor: number;
@@ -26,7 +26,7 @@ interface Settings {
 }
 
 const DEFAULT_SETTINGS: Settings = {
-  sizeFactor: 1,
+  sizeFactor: 0.64,
   tileWidth: 364,
   tileHeight: 317,
   tileNumberOverlay: false,
@@ -69,7 +69,6 @@ class BoardView extends Component {
     this.sizeFactor = settings.sizeFactor || DEFAULT_SETTINGS.sizeFactor;
     this.tileNumberOverlay =
       settings.tileNumberOverlay || DEFAULT_SETTINGS.tileNumberOverlay;
-    console.log(this.tileHeight, this.tileWidth);
     this.components = {
       tileControls: new TileControls(this),
       boardControls: new BoardControls(this),
@@ -94,36 +93,39 @@ class BoardView extends Component {
     this._addEventListeners();
   }
 
-  update(updatedElements: BoardViewUpdate): void {
-    console.log("Updating tiles", updatedElements);
-    for (const i of updatedElements) {
+  update(updates: BoardViewUpdate): void {
+    console.log("Updating boardView", updates);
+    if (updates.includes("mapSize")) {
+      const newLen = this.current.board.length;
+      const curLen = this.tileWrappers.length;
+      if (curLen < newLen) {
+        console.log("curLen:", curLen, "newLen: ", newLen);
+        for (let i = curLen; i < newLen; i++) this._addTileWrapper(i);
+      }
+      if (curLen > newLen) {
+        console.log("curLen:", curLen, "newLen: ", newLen);
+        for (let i = newLen; i < curLen; i++) this.tileWrappers[i].remove();
+        this.tileWrappers = this.tileWrappers.slice(0, newLen);
+      }
+    }
+    for (const i of updates) {
       if (typeof i === "number") {
         if (i < this.current.size) {
           if (i >= this.tileWrappers.length) this._addTileWrapper(i);
           this._drawTile(this.current.board[i], i);
         }
       }
-      if (i === "tileControls") this.components.tileControls.update();
-      if (i === "allIndices")
-        this.current.board.forEach((t, i) => this._drawTile(t, i));
-      if (i === "mapSize") {
-        const newLen = this.current.board.length;
-        const curLen = this.tileWrappers.length;
-        if (curLen < newLen) {
-          for (let i = curLen; i < newLen; i++) this._addTileWrapper(i);
-        }
-        if (curLen > newLen) {
-          for (let i = newLen; i < curLen; i++) this.tileWrappers[i].remove();
-          this.tileWrappers = this.tileWrappers.slice(0, newLen);
-        }
-        this._setBoardSizes();
-        this._style();
-      }
-      if (i === "tileSize") {
-        this._setBoardSizes();
-        this._style();
-        this.tileWrappers.forEach((_, i) => this._styleTileWrapper(i));
-      }
+    }
+    if (updates.includes("tileControls")) this.components.tileControls.update();
+    if (updates.includes("allIndices"))
+      this.current.board.forEach((t, i) => this._drawTile(t, i));
+    if (updates.includes("tileSize") || updates.includes("mapSize")) {
+      this._setBoardSizes();
+      this._style();
+      this.tileWrappers.forEach((_, i) => {
+        this._drawTile(this.current.board[i], i);
+        this._styleTileWrapper(i);
+      });
     }
   }
 

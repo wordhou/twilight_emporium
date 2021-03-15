@@ -7,6 +7,25 @@
   background: limegreen;
 }
 
+.saving-indicator {
+  color: darkgrey;
+  display: none;
+}
+
+.editMapName,
+.nameEditor {
+  display: none;
+}
+
+.editMapName.on,
+.nameEditor.on {
+  display: inline;
+}
+
+.mapInfo.saving > .saving-indicator {
+  display: inline;
+}
+
 .editor-controls-wrapper {
   display: flex;
   flex-flow: row nowrap;

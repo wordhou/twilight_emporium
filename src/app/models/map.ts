@@ -5,7 +5,7 @@ import User from "./user";
 export interface MapData {
   map_id?: number;
   created?: string;
-  user_id: number;
+  user_id?: number;
   map_name: string;
   versions: string[];
   description: string;
@@ -45,12 +45,11 @@ class TwilightMap {
     } else {
       await db.query(
         `UPDATE maps SET
-          user_id = $1,
-          description = $2,
-          versions = $3,
-          map_name = $4
-        WHERE map_id = $5;`,
-        [this.user_id, this.description, this.versions, this.map_name]
+          description = $1,
+          versions = $2,
+          map_name = $3
+        WHERE map_id = $4;`,
+        [this.description, this.versions, this.map_name, this.map_id]
       );
     }
     return this;
@@ -125,6 +124,7 @@ class TwilightMap {
         deleted,
       });
     });
+    if (this.user_id === undefined) throw new Error("Map has no user_id");
     const author = await User.get(this.user_id);
     this.author = author;
   }
@@ -167,6 +167,16 @@ class TwilightMap {
               REFERENCES users(user_id)
           );`
     );
+  }
+
+  static async query(): Promise<Array<TwilightMap>> {
+    const result = await db.query(
+      `select m.map_id, m.map_name, m.description, m.created, m.updated, u.display_name
+      from maps m
+      INNER JOIN users u on m.user_id = u.user_id`,
+      []
+    );
+    return result.rows;
   }
 }
 

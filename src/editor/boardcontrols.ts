@@ -13,11 +13,15 @@ export default class BoardControls extends Component {
     super();
     this.boardView = boardView;
     this.components = {
-      zoomIn: this.button("", "Zoom in", "zoomIn"),
-      zoomOut: this.button("", "Zoom out", "zoomOut"),
-      addRing: this.button("", "Add ring", "addRing"),
-      removeRing: this.button("", "Remove ring", "removeRing"),
-      toggleNumbers: this.button("", "Toggle numbers", "toggleNumbers"),
+      zoomIn: this.button("zoom-in", "Zoom in", "zoomIn"),
+      zoomOut: this.button("zoom-out", "Zoom out", "zoomOut"),
+      addRing: this.button("plus-circle-fill", "Add ring", "addRing"),
+      removeRing: this.button("dash-circle-fill", "Remove ring", "removeRing"),
+      toggleNumbers: this.button(
+        "info-square-fill",
+        "Toggle numbers",
+        "toggleNumbers"
+      ),
     };
   }
 
@@ -54,7 +58,7 @@ export default class BoardControls extends Component {
     return {
       render: (el: HTMLElement) => {
         el.classList.add("board-controls-button");
-        el.innerHTML = `<a><i class="${bootstrapIcon}"></i>${text}</a>`;
+        el.innerHTML = `<a><i class="bi-${bootstrapIcon}"></i>${text}</a>`;
         el.addEventListener("click", () => {
           const customEvent = new CustomEvent(eventName, {
             bubbles: true,

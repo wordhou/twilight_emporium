@@ -1,0 +1,106 @@
+body,
+div,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+ul,
+li,
+form,
+label,
+section,
+nav,
+header,
+footer {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+body {
+  line-height: 1;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+body {
+  font-size: 16px;
+}
+
+body > header {
+  border: thin solid magenta;
+  background-color: #111;
+}
+
+.title-line {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+  padding: 0.8em 0 0.2em 0em;
+}
+
+.title-line > h1,
+.title-line > h2 {
+  background-color: #f3ec78;
+  background-image: linear-gradient(orange, palegoldenrod);
+  background-size: 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -moz-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-text-fill-color: transparent;
+}
+
+.title-line > h1 {
+  font: bold 2.2em "Playfair Display", serif;
+  text-transform: uppercase;
+  color: orange;
+  margin-left: 1em;
+}
+
+.title-line > h2 {
+  font: bold 1.5em "Playfair Display", serif;
+  color: orange;
+  margin-left: 1em;
+}
+
+.nav-links {
+  font: bold 1.2em "Roboto Condensed", sans-serif;
+  margin-left: 2em;
+  display: flex;
+  flex-flow: row nowrap;
+  color: white;
+}
+
+.nav-links > li {
+  margin: 0.8em;
+}
+
+.nav-links a:link,
+.nav-links a:visited {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav-links a:hover,
+.nav-links a:active {
+  color: #edc;
+  text-decoration: none;
+}
+
+.login {
+  margin-left: 2em;
+}
+
+.logout-button {
+  margin-left: 1em;
+}

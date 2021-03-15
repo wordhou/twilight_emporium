@@ -4,6 +4,13 @@
   overflow-y: scroll;
 }
 
+.unused-tile {
+  width: 150px;
+  height: 140px;
+}
+
 .unused-tile > img {
   pointer-events: none;
+  width: 100%;
+  height: 100%;
 }

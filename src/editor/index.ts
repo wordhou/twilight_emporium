@@ -7,8 +7,8 @@ import { UserData } from "../app/models/user";
 
 interface InitVars {
   map_id: number;
-  userData: UserData;
-  mapData: MapData;
+  userData?: UserData;
+  mapData?: MapData;
 }
 
 type CustomWindow = Window & typeof globalThis & { __INIT__: InitVars };

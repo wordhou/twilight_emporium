@@ -20,4 +20,10 @@ authRouter.get(
   }
 );
 
+authRouter.get("/auth/logout", (req, res) => {
+  const redirect = req.query.redirect as string | undefined;
+  req.logout();
+  res.redirect(redirect || "/");
+});
+
 export default authRouter;

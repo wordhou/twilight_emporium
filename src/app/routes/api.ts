@@ -20,6 +20,11 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+api.get("/maps", async (req, res) => {
+  const maps = await TwilightMap.query();
+  res.json(maps);
+});
+
 api.post("/maps", requireAuth, async (req, res) => {
   const { map_name, description } = req.body;
   const user_id = (req.user as User).user_id;
@@ -54,12 +59,11 @@ api.put("/maps/:id", requireAuth, async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
   const { newVersion, map_name, description, redirect } = req.body;
-  if (map_name !== undefined || description !== undefined) {
-    if (newVersion !== undefined) map.versions.push(newVersion);
-    await map.save();
-  } else if (newVersion !== undefined) {
-    await map.addVersion(newVersion);
-  }
+  if (map_name !== undefined) map.map_name = map_name;
+  if (description !== undefined) map.description = description;
+  if (newVersion !== undefined && newVersion !== map.latest)
+    map.versions.push(newVersion);
+  await map.save();
   if (redirect !== undefined) res.redirect(redirect);
   else res.json(map.getData());
 });
