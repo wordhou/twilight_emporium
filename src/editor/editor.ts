@@ -75,12 +75,14 @@ class Editor {
     <div class="editor-main">
       <div class="boardView"></div>
       <div class="editor-main-sidebar">
-        <div class="generatorPane"></div>
         <div class="tileSelector"></div>
       </div>
       </div>
     </div>
     `;
+
+    /*
+     */
     this.nodes = Component.attachComponentsToNodes(this.components, target);
 
     this._addEventListeners();

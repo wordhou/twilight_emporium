@@ -14,32 +14,13 @@
 }
 
 .tileControls {
-  position: absolute;
   width: 0px;
   height: 0px;
   overflow: visible;
   z-index: 5;
 }
 
-.rotateCCW {
-  top: 0px;
-  left: -37.4px;
-}
-.rotateCW {
-  top: 0px;
-  left: 318px;
-}
-.resetRotation {
-  top: -31.7px;
-  left: 150px;
-}
+.clearTiles,
 .flipTile {
   display: none;
-  top: 80%;
-  left: 80%;
-}
-.clearTiles {
-  display: none;
-  top: 80%;
-  left: -5%;
 }

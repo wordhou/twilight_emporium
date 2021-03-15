@@ -78,8 +78,8 @@ class BoardView extends Component {
   render(target: HTMLElement): void {
     this.target = target;
     target.innerHTML = `
-    <div class="boardControls"></div>
     <div class="boardWrapper">
+      <div class="boardControls"></div>
       <div class="tileControls"></div>
     </div>
     `;
@@ -180,16 +180,19 @@ class BoardView extends Component {
     const name = Tiles.getName(tile);
     const rotation = Tiles.getRotation(tile);
     const r = rotation === undefined ? 0 : rotation * 60;
+
     const img = ((i) =>
       i === null ? div.appendChild(document.createElement("img")) : i)(
       div.querySelector("img")
     );
+    img.src =
+      name === "-1" ? `tiles/empty-hex.svg` : `tiles/large/ST_${name}.png`;
+    img.setAttribute("style", "fill: rgba(65,70,75,45)");
     img.classList.add("tile-img");
+
     div.classList.toggle("selected", has(this.editorState.selection, index));
     div.classList.toggle("droptarget", has(this.editorState.dropTarget, index));
     div.classList.toggle("hidden", index >= this.current.size);
-
-    img.src = `tiles/large/ST_${name}.png`;
     img.style.transform = `rotate(${r}deg)`;
   }
 

@@ -21,8 +21,9 @@ class TIMapArray implements State {
     } else {
       this.rings = input;
       this.board = new Uint16Array(1 + 3 * this.rings * (this.rings + 1)).fill(
-        0
+        -1
       );
+      this.board[0] = Tiles.fromTTSString("18") as number;
     }
   }
   clone(): this {
@@ -47,9 +48,13 @@ class TIMapArray implements State {
       );
     if (r === this.rings) return;
     if (r < this.rings) this.board = this.board.slice(0, SPACES[r]); // Shrink the board
+    const empty = Tiles.fromTTSString("-1") as number;
     if (r > this.rings) {
       const newBoard = new Uint16Array(SPACES[r]);
       this.board.forEach((v, i) => (newBoard[i] = v));
+      for (let i = 0; i < SPACES[r]; i++) {
+        newBoard[i] = i < this.board.length ? this.board[i] : empty;
+      }
       this.board = newBoard;
     }
     this.rings = r;

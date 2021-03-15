@@ -29,13 +29,11 @@ export default class TileControls extends Component {
   render(target: HTMLElement): void {
     this.target = target;
     target.innerHTML = `
-    <div class="tileControlsButtonsWrapper">
     <div class="rotateCCW"></div>
     <div class="resetRotation"></div>
     <div class="rotateCW"></div>
     <div class="flipTile"></div>
     <div class="clearTiles"></div>
-    </div>
     `;
     this.nodes = Component.attachComponentsToNodes(
       this.components,
@@ -54,14 +52,19 @@ export default class TileControls extends Component {
     const edState = this.boardView.editorState;
     if (edState.name === "selection" && edState.selection.length === 1) {
       const sel = edState.selection[0];
-      const [x, y] = Hex.spiralToXY(
-        sel,
-        this.boardView.tileWidth,
-        this.boardView.tileHeight
-      );
-      this.target.style.top = this.boardView.topOffset - y + "px";
-      this.target.style.left = this.boardView.leftOffset + x + "px";
+      const [tw, th] = [
+        this.boardView.sizeFactor * this.boardView.tileWidth,
+        this.boardView.sizeFactor * this.boardView.tileHeight,
+      ];
+      const [x_rel, y_rel] = Hex.spiralToXY(sel, tw, th);
+      const [x, y] = [
+        this.boardView.leftOffset + x_rel,
+        this.boardView.topOffset - y_rel,
+      ];
       this.target.style.display = "block";
+      position(this.nodes.rotateCCW, x - 0.2 * tw, y + 0.2 * th);
+      position(this.nodes.rotateCW, x + 0.8 * tw, y + 0.2 * th);
+      position(this.nodes.resetRotation, x + 0.3 * tw, y - 0.1 * th);
     } else {
       this.target.style.display = "none";
     }
@@ -89,3 +92,8 @@ const button = (
     },
   };
 };
+
+function position(node: HTMLElement, left: number, top: number): void {
+  node.style.left = `${left}px`;
+  node.style.top = `${top}px`;
+}

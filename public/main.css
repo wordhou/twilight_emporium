@@ -44,8 +44,32 @@ body > header {
 body > footer {
   background-color: #111;
   color: #cdd;
-  margin-top: 1em;
   padding: 1em;
+}
+
+main.home-page {
+  max-width: 50em;
+  margin-left: 1em;
+  padding: 2em;
+  background-color: #dde5ea;
+}
+
+figure {
+  margin: 0 auto;
+  max-width: 70%;
+  padding: 0.8em;
+}
+
+figure > img {
+  max-width: 100%;
+  height: auto;
+}
+
+figure > figcaption {
+  margin: 0.4em 0 0 0;
+  text-align: center;
+  font-style: italic;
+  color: #555a5e;
 }
 
 .title-line {

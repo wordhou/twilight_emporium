@@ -154,19 +154,19 @@ class TwilightMap {
     description,
     map_name,
     published = false,
-    versions = [],
+    newVersion,
   }: {
     user_id: number;
     description: string;
     map_name: string;
     published: boolean;
-    versions?: string[];
+    newVersion: string;
   }): Promise<TwilightMap> {
     const map = new TwilightMap({
       user_id,
       description,
       map_name,
-      versions,
+      versions: [newVersion],
       published,
     });
     await map.save();

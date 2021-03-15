@@ -2,7 +2,7 @@ import "./tileselector.css";
 import Editor from "./editor";
 import Component from "../lib/component";
 import BoardView from "./boardview";
-import { Tile, TileInfo, TileName, TileNameSet } from "../types";
+import { Tile, TileInfo, TileName, TileNameSet, TileType } from "../types";
 import Tiles from "../lib/tiles";
 import data from "../data.json";
 
@@ -20,6 +20,8 @@ const filters = {
     !ti.hyperlanes &&
     ti.planets.length === 0,
 } as const;
+
+const tiles = data.tiles;
 
 type TileFilter = keyof typeof filters;
 
@@ -50,12 +52,12 @@ export default class TileSelector {
   editor: Editor;
   filters: Filters;
   unusedTiles: Set<string>;
-  tileNames = Object.keys(data.tiles);
+  tileNames = Object.keys(tiles);
   tiles: Record<string, HTMLElement>;
 
   constructor(editor: Editor) {
     this.editor = editor;
-    this.unusedTiles = new Set(Object.keys(data.tiles));
+    this.unusedTiles = new Set(Object.keys(tiles));
     for (const t of this.editor.current.board)
       this.unusedTiles.delete(Tiles.getName(t));
     this.tiles = {};
@@ -72,12 +74,13 @@ export default class TileSelector {
     <h2>Unused tiles</h2>
     </header>
     <section class="tileSelectorSettings"></section>
-    <div class="tilesWrapper"></div>
+      <div class="tilesWrapper"></div>
     `;
     this.nodes = Component.getNodesByClass(
       ["tilesWrapper", "tileSelectorSettings"],
       target
     );
+
     this.components.tileSelectorSettings.render(
       this.nodes.tileSelectorSettings
     );
@@ -106,14 +109,14 @@ export default class TileSelector {
       }
     }
     if (filter !== undefined && filter in filters)
-      Object.entries(data.tiles)
+      Object.entries(tiles)
         .filter(([_, v]) => filters[filter](v as TileInfo))
         .forEach(([name, _]) => this._updateTile(name as TileName));
   }
 
   _makeTiles(): void {
     const tilesWrapper = this.nodes.tilesWrapper;
-    for (const tileName in data.tiles) {
+    for (const tileName in tiles) {
       const tile = this._makeTile(tileName);
       tilesWrapper.appendChild(tile);
       this.tiles[tileName] = tile;
@@ -136,7 +139,7 @@ export default class TileSelector {
   _updateTile(name: TileName): void {
     const board = this.editor.current.board; // Uses current board state
     const style = this.tiles[name].style;
-    const tileInfo = data.tiles[name] as TileInfo;
+    const tileInfo = tiles[name] as TileInfo;
     for (const fn in filters) {
       if (
         !this.filters[fn as TileFilter] &&
@@ -149,7 +152,7 @@ export default class TileSelector {
     const re = /(\d+)(A|B)?/.exec(name);
     if (re === null) throw new Error(`Invalid tile name ${name}`);
     const tileNum = parseInt(re[1]);
-    if (board.some((t) => Tiles.getNumber(t) === tileNum)) {
+    if (name !== "0" && board.some((t) => Tiles.getNumber(t) === tileNum)) {
       style.display = "none";
       return;
     }

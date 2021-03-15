@@ -1,21 +1,27 @@
 body {
   height: 100vh;
-  overflow: hidden;
+  width: 100vw;
   display: flex;
   flex-flow: column;
+  overflow: hidden;
 }
 
-.editor-app {
-  flex-grow: 1;
+body > header,
+body > footer {
+}
+
+#editor-app {
   display: flex;
   flex-flow: column;
+  overflow: hidden;
 }
 
 .editor-main {
   display: flex;
   flex-flow: row nowrap;
-  flex-grow: 1;
-  flex-shrink: 0;
+  overflow: hidden;
+  flex: 1 1 100%;
+  width: 100vw;
 }
 
 .editorControls {
@@ -23,7 +29,26 @@ body {
   flex-shrink: 0;
 }
 
-footer {
-  flex-grow: 0;
-  flex-shrink: 0;
+.boardView {
+  max-width: 80%;
+  overflow: scroll;
+  flex: 1 1 auto;
+}
+
+.editor-main-sidebar {
+  overflow-y: hidden;
+  max-width: 80%;
+  display: flex;
+  flex: 1 1 30%;
+  flex-flow: column;
+}
+
+.tileSelector {
+  overflow: hidden;
+}
+
+.tilesWrapper {
+  overflow: scroll;
+  min-height: 0;
+  flex: 1 1;
 }

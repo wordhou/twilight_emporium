@@ -64,8 +64,8 @@ type PlanetInfo = {
 };
 
 const Tiles = data.tiles;
-
 type TileName = keyof typeof Tiles;
+//type TileName = string;
 
 type TwilightData = {
   tiles: {

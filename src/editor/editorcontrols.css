@@ -1,15 +1,36 @@
 .editorControls {
-  background: yellow;
+  background-color: #9ab;
 }
 
 .mapInfo {
   display: block;
-  background: limegreen;
+  padding: 1em;
 }
 
-.saving-indicator {
+.map-name-line {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+}
+
+.mapInfo h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-right: 1em;
+}
+
+.saving-indicator,
+.map-saved-indicator {
   color: darkgrey;
   display: none;
+}
+
+.mapInfo.saving > .saving-indicator {
+  display: inline;
+}
+
+.mapInfo.saved > .map-saved-indicator {
+  display: inline;
 }
 
 .editMapName,
@@ -22,10 +43,6 @@
   display: inline;
 }
 
-.mapInfo.saving > .saving-indicator {
-  display: inline;
-}
-
 .editor-controls-wrapper {
   display: flex;
   flex-flow: row nowrap;
@@ -33,16 +50,23 @@
 
 .editor-controls-button {
   display: block;
-
-  font-size: 1.5em;
   border-radius: 0.25em;
   padding: 0.5em;
   margin: 0.25em;
   text-align: center;
-  background-color: magenta;
+  background-color: #fc922f;
   color: white;
 }
 
+.editor-controls-button:hover {
+  color: #ddd;
+}
+
+.editor-controls-button:active {
+  color: #777;
+}
+
 .editor-controls-button.inactive {
-  background-color: grey;
+  background-color: #aaabac;
+  color: #555;
 }

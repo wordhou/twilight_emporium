@@ -39,14 +39,13 @@ class StateTransitions {
       name,
       selection,
     }: EditorState): EditorStateUpdate | undefined => {
-      console.log("save transition", this);
       if (name === "idle" || name === "selection") {
         api.save();
         return {
           name: "saving",
           selection,
           dropTarget: [],
-          updated: { editorControls: true },
+          updated: { editorControls: "unsaved" },
         };
       }
     };
@@ -56,13 +55,12 @@ class StateTransitions {
     name,
     selection,
   }: EditorState): EditorStateUpdate | undefined {
-    console.log("saveComplete transition");
     if (name === "saving") {
       return {
         name: selection.length > 0 ? "selection" : "idle",
         selection,
         dropTarget: [],
-        updated: { editorControls: true },
+        updated: { editorControls: "saved" },
       };
     }
   }
@@ -169,9 +167,12 @@ class StateTransitions {
             dropTarget: [],
             updated: {
               boardView: ["tileControls", ...selection, ...newDropTarget],
-              editorControls: true,
+              editorControls: "unsaved",
             },
-            edit: new Edits.SwapManyTiles(util.zip(selection, dropTarget)),
+            edit:
+              i === selection[0]
+                ? undefined
+                : new Edits.SwapManyTiles(util.zip(selection, dropTarget)),
           };
         if (tile !== undefined)
           return {
@@ -181,6 +182,7 @@ class StateTransitions {
             updated: {
               tileSelector: { all: true },
               boardView: ["tileControls", ...dropTarget, ...newDropTarget],
+              editorControls: "unsaved",
             },
             edit: new Edits.SetTile(tile, newDropTarget[0]),
           };
@@ -227,7 +229,7 @@ class StateTransitions {
           selection,
           dropTarget,
           edit: new Edits.RotateTile(selection[0], r),
-          updated: { boardView: selection, editorControls: true },
+          updated: { boardView: selection, editorControls: "unsaved" },
         };
     };
   }
@@ -242,7 +244,7 @@ class StateTransitions {
         selection,
         dropTarget,
         edit: new Edits.ResetTiles(selection),
-        updated: { boardView: [...selection], editorControls: true }, //TODO
+        updated: { boardView: [...selection], editorControls: "unsaved" }, //TODO
       };
     }
   }

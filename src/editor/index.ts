@@ -15,14 +15,17 @@ type CustomWindow = Window & typeof globalThis & { __INIT__: InitVars };
 declare const window: CustomWindow;
 
 const initVars = window.__INIT__ as InitVars;
-let initial = undefined;
 const map = initVars.mapData;
-if (map) {
-  const latest = map.versions[map.versions.length - 1];
-  initial = TIMapArray.fromTTSString(latest) as TIMapArray;
-}
+
+const initial =
+  map === undefined || map.versions.length === 0
+    ? undefined
+    : (TIMapArray.fromTTSString(
+        map.versions[map.versions.length - 1]
+      ) as TIMapArray);
+
 const editor = new Editor({
-  initial: map === undefined ? undefined : initial,
+  initial,
   mapData: initVars.mapData,
   userData: initVars.userData,
 });

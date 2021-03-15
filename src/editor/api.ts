@@ -10,7 +10,8 @@ export default class Api {
   canSave(): boolean {
     return (
       this.editor.userData !== undefined &&
-      this.editor.mapData.user_id === this.editor.userData.user_id
+      (this.editor.mapData.user_id === this.editor.userData.user_id ||
+        this.editor.mapData.user_id === undefined)
     );
   }
 

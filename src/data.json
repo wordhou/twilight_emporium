@@ -1,5 +1,9 @@
 {
   "tiles": {
+    "0": {
+      "type": "green",
+      "planets": []
+    },
     "1": {
       "type": "green",
       "faction": "The Federation of Sol",

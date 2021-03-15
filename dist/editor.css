@@ -14,41 +14,18 @@
 }
 
 .tileControls {
-  position: absolute;
   width: 0px;
   height: 0px;
   overflow: visible;
   z-index: 5;
 }
 
-.rotateCCW {
-  top: 0px;
-  left: -37.4px;
-}
-.rotateCW {
-  top: 0px;
-  left: 318px;
-}
-.resetRotation {
-  top: -31.7px;
-  left: 150px;
-}
+.clearTiles,
 .flipTile {
   display: none;
-  top: 80%;
-  left: 80%;
-}
-.clearTiles {
-  display: none;
-  top: 80%;
-  left: -5%;
 }
 
 .boardView {
-  overflow: scroll;
-  width: 80%;
-  flex-grow: 1;
-  flex-shrink: 0;
 }
 
 .boardWrapper {
@@ -77,8 +54,9 @@
 
 .number-overlay {
   position: absolute;
-  margin: auto;
-  font: bold 3em "Roboto", sans-serif;
+  left: 40%;
+  top: 40%;
+  font: bold 2.5em "Roboto", sans-serif;
   z-index: 1;
   color: white;
   visibility: hidden;
@@ -89,7 +67,8 @@
 }
 
 .boardControls {
-  background: cyan;
+  position: fixed;
+  z-index: 10;
 }
 
 .board-controls-wrapper {
@@ -100,27 +79,31 @@
 .board-controls-button {
   display: block;
 
-  font-size: 1.5em;
   border-radius: 0.25em;
   padding: 0.5em;
-  margin: 0.25em;
+  margin: 0 0.25em;
   text-align: center;
-  background-color: magenta;
+  background-color: #111;
   color: white;
 }
 
 .board-controls-button.inactive {
-  background-color: grey;
+  color: #555;
+}
+
+.tileSelector {
+  display: flex;
+  flex-flow: column;
 }
 
 .tilesWrapper {
   display: flex;
+  flex: 1 1;
   flex-flow: row wrap;
-  overflow-y: scroll;
 }
 
 .unused-tile {
-  width: 150px;
+  width: 160px;
   height: 140px;
 }
 
@@ -131,17 +114,38 @@
 }
 
 .editorControls {
-  background: yellow;
+  background-color: #9ab;
 }
 
 .mapInfo {
   display: block;
-  background: limegreen;
+  padding: 1em;
 }
 
-.saving-indicator {
+.map-name-line {
+  display: flex;
+  flex-flow: row;
+  align-items: baseline;
+}
+
+.mapInfo h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-right: 1em;
+}
+
+.saving-indicator,
+.map-saved-indicator {
   color: darkgrey;
   display: none;
+}
+
+.mapInfo.saving > .saving-indicator {
+  display: inline;
+}
+
+.mapInfo.saved > .map-saved-indicator {
+  display: inline;
 }
 
 .editMapName,
@@ -154,10 +158,6 @@
   display: inline;
 }
 
-.mapInfo.saving > .saving-indicator {
-  display: inline;
-}
-
 .editor-controls-wrapper {
   display: flex;
   flex-flow: row nowrap;
@@ -165,18 +165,25 @@
 
 .editor-controls-button {
   display: block;
-
-  font-size: 1.5em;
   border-radius: 0.25em;
   padding: 0.5em;
   margin: 0.25em;
   text-align: center;
-  background-color: magenta;
+  background-color: #fc922f;
   color: white;
 }
 
+.editor-controls-button:hover {
+  color: #ddd;
+}
+
+.editor-controls-button:active {
+  color: #777;
+}
+
 .editor-controls-button.inactive {
-  background-color: grey;
+  background-color: #aaabac;
+  color: #555;
 }
 
 .editor-main {
@@ -190,22 +197,28 @@
 
 body {
   height: 100vh;
-  overflow: hidden;
+  width: 100vw;
   display: flex;
   flex-flow: column;
+  overflow: hidden;
 }
 
-.editor-app {
-  flex-grow: 1;
+body > header,
+body > footer {
+}
+
+#editor-app {
   display: flex;
   flex-flow: column;
+  overflow: hidden;
 }
 
 .editor-main {
   display: flex;
   flex-flow: row nowrap;
-  flex-grow: 1;
-  flex-shrink: 0;
+  overflow: hidden;
+  flex: 1 1 100%;
+  width: 100vw;
 }
 
 .editorControls {
@@ -213,8 +226,27 @@ body {
   flex-shrink: 0;
 }
 
-footer {
-  flex-grow: 0;
-  flex-shrink: 0;
+.boardView {
+  max-width: 80%;
+  overflow: scroll;
+  flex: 1 1 auto;
+}
+
+.editor-main-sidebar {
+  overflow-y: hidden;
+  max-width: 80%;
+  display: flex;
+  flex: 1 1 30%;
+  flex-flow: column;
+}
+
+.tileSelector {
+  overflow: hidden;
+}
+
+.tilesWrapper {
+  overflow: scroll;
+  min-height: 0;
+  flex: 1 1;
 }
 

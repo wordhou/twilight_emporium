@@ -7,10 +7,12 @@ export default class EditorControls extends Component {
   nodes!: Record<string, HTMLElement>;
   components!: Record<string, Component>;
   target!: HTMLElement;
+  saved: boolean;
 
   constructor(editor: Editor) {
     super();
     this.editor = editor;
+    this.saved = false;
     this.components = {
       mapInfo: this.info(),
       undoEdit: this.button("bi-caret-left-fill", "Undo", "undoEdit"),
@@ -40,10 +42,13 @@ export default class EditorControls extends Component {
     this.style();
   }
 
-  update(i: boolean | "renderInfo"): void {
-    this.style();
+  update(i: boolean | "renderInfo" | "saved" | "unsaved"): void {
     if (i === "renderInfo") {
       this.info().render(this.nodes.mapInfo);
+    } else {
+      if (i === "unsaved") this.saved = false;
+      if (i === "saved") this.saved = true;
+      this.style();
     }
   }
 
@@ -57,11 +62,12 @@ export default class EditorControls extends Component {
       "inactive",
       this.editor.editHistory.onTop()
     );
-    this.nodes.mapInfo.classList.toggle("saving", saving);
     this.nodes.saveMap.classList.toggle(
       "inactive",
       saving || !this.editor.api.canSave()
     );
+    this.nodes.mapInfo.classList.toggle("saving", saving);
+    this.nodes.mapInfo.classList.toggle("saved", this.saved);
   }
 
   button(
@@ -91,13 +97,16 @@ export default class EditorControls extends Component {
         const mapName = this.editor.mapData.map_name || "Untitled Map";
 
         t.innerHTML = `
-        <h1>${mapName}</h1>
-        <a class="editMapName on">Edit name</a>
-        <span class="nameEditor">
+        <div class="map-name-line">
+        <h1>${mapName} 
+        </h1>
+        <button class="editMapName on edit-button">Edit name</button>
+        <div class="nameEditor">
         <input class="mapNameInput" value="${mapName}"></input>
-        <a class="nameEditorSubmit">Done</a>
-        </span>
-        <span class="saving-indicator">Saving map...</span>
+        <a class="nameEditorSubmit edit-button">Done</a>
+        </div>
+        <span class="saving-indicator">Saving map...  </span>
+        <span class="map-saved-indicator">Map saved!</span>
         `;
         const nodes = Component.getNodesByClass(
           ["editMapName", "nameEditor", "nameEditorSubmit", "mapNameInput"],

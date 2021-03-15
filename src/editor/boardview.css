@@ -1,8 +1,4 @@
 .boardView {
-  overflow: scroll;
-  width: 80%;
-  flex-grow: 1;
-  flex-shrink: 0;
 }
 
 .boardWrapper {
@@ -31,8 +27,9 @@
 
 .number-overlay {
   position: absolute;
-  margin: auto;
-  font: bold 3em "Roboto", sans-serif;
+  left: 40%;
+  top: 40%;
+  font: bold 2.5em "Roboto", sans-serif;
   z-index: 1;
   color: white;
   visibility: hidden;

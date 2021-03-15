@@ -53,7 +53,7 @@ router.get("/maps", async (req, res) => {
 router.get("/yourmaps", async (req, res) => {
   const user = req.user as User | undefined;
   if (user === undefined) {
-    res.redirect("/");
+    res.redirect(`/auth?redirect=/yourmaps`);
   } else {
     const user_id = user !== undefined ? user.user_id : undefined;
     const maps = await TwilightMap.query(user_id, user_id);

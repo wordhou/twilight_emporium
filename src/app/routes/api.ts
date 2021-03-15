@@ -12,7 +12,6 @@ const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    // (req.session as any).redirect = req.originalUrl;
     let redirect;
     if (req.params.redirect) redirect = req.params.redirect;
     if (req.body.redirect) redirect = req.body.redirect;
@@ -26,7 +25,7 @@ api.get("/maps", async (req, res) => {
 });
 
 api.post("/maps", requireAuth, async (req, res) => {
-  const { map_name, description, published } = req.body;
+  const { map_name, description, published, newVersion } = req.body;
   const user_id = (req.user as User).user_id;
   if (user_id === undefined) throw new Error("User has no user_id");
   const map = await TwilightMap.create({
@@ -34,6 +33,7 @@ api.post("/maps", requireAuth, async (req, res) => {
     description,
     map_name,
     published,
+    newVersion,
   });
   res.json(map);
 });
@@ -63,6 +63,10 @@ api.get("/maps/:id/latest/small.jpg", async (req, res) => {
 api.put("/maps/:id", requireAuth, async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
+  const user = req.user as User;
+  if (user.user_id !== map.user_id) {
+    return res.status(403).send("Forbidden");
+  }
   const { newVersion, map_name, published, description, redirect } = req.body;
   if (map_name !== undefined) map.map_name = map_name;
   if (description !== undefined) map.description = description;
