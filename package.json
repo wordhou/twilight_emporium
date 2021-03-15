@@ -40,7 +40,6 @@
     "svg-url-loader": "^7.1.1",
     "ts-jest": "^26.5.2",
     "ts-loader": "^8.0.17",
-    "typescript": "^4.2.2",
     "webpack": "^5.24.4",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"
@@ -57,7 +56,6 @@
     ]
   },
   "dependencies": {
-    "ts-node": "^9.1.1",
     "cookie-parser": "^1.4.5",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
@@ -68,6 +66,8 @@
     "passport": "^0.4.1",
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.5.1",
-    "sharp": "^0.27.2"
+    "sharp": "^0.27.2",
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.3"
   }
 }
