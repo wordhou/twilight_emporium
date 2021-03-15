@@ -33,12 +33,19 @@ ul {
 }
 
 body {
+  font-family: "Roboto", sans-serif;
   font-size: 16px;
 }
 
 body > header {
-  border: thin solid magenta;
   background-color: #111;
+}
+
+body > footer {
+  background-color: #111;
+  color: #cdd;
+  margin-top: 1em;
+  padding: 1em;
 }
 
 .title-line {
@@ -103,4 +110,44 @@ body > header {
 
 .logout-button {
   margin-left: 1em;
+}
+
+.button-line {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.button-line a,
+.button-line form {
+  display: block;
+  flex-grow: 0;
+  margin: 0.25em;
+}
+
+.edit-button {
+  border-radius: 0.25em;
+  padding: 0.4em;
+  background-color: #cecece;
+  color: #222;
+  text-decoration: none;
+}
+
+.edit-button:hover {
+  color: #555;
+}
+
+.edit-button:active {
+  color: #999;
+}
+
+button,
+input[type="submit"],
+input[type="reset"] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }

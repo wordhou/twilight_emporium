@@ -1,0 +1,13 @@
+<% if (map.published === false) {%>
+  <form action="<%=urlRoot%>/api/maps/<%=map.map_id%>?_method=PUT" method=POST>
+    <button class="edit-button" href=""><i class="bi bi-broadcast"></i>Publish map</button>
+    <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
+    <input type="hidden" name="published" value="true" />
+  </form>
+<% } else { %>
+  <form action="<%=urlRoot%>/api/maps/<%=map.map_id%>?_method=PUT" method=POST>
+    <button class="edit-button" href=""><i class="bi bi-broadcast"></i>Unpublish map</button>
+    <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
+    <input type="hidden" name="published" value="false"/>
+  </form>
+<% } %>

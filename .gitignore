@@ -1,8 +1,5 @@
 node_modules
 .vim
-public/tiles
-dist
 scratch
 src/**/*.js
-**/*.jpg
-
+.env

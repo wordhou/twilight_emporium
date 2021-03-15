@@ -1,0 +1,28 @@
+<section class="map-listing">
+  <figure class="map-image-wrapper">
+    <a href="maps/<%=map.map_id%>">
+      <% if (map.versions.length > 0) { %>
+        <img class="map-image" src="api/maps/<%=map.map_id%>/latest/small.jpg">
+      <% } else { %>
+        <div class="placeholder-image">This map has no content yet</div>
+      <% } %>
+    </a>
+  </figure>
+  <div class="map-content">
+    <h1><%=map.map_name || "Untitled map" %></h1>
+    <h2>Made by <%=map.display_name%> on <%=map.updated%></h2>
+    <div class="map-description">
+      <%=map.description%>
+    </div>
+
+    <div class="button-line">
+      <% if (user && map.user_id === user.user_id) { %>
+      <a class="edit-button" href="editor?map_id=<%=map.map_id%>">
+        <i class="bi bi-palette"></i>
+        Edit map!
+      </a>
+      <%- include('../partials/publish', {user, map}); %>
+      <% } %>
+    </div>
+  </div>
+</section>

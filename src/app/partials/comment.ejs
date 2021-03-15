@@ -1,0 +1,30 @@
+<div id="comment-<%= comment.comment_id%>" class="comment-wrapper">
+  <% if (!comment.deleted) {%>
+<h1> Posted by <%= comment.user.display_name %> </h1>
+<h2> on <%= comment.created %> </h2>
+<div class="comment-text">
+<%= comment.text %>
+</div>
+<% if ( new Date(comment.updated).getTime() != new Date(comment.created).getTime() ) { %>
+  <div class="edited-line"> Edited on <%=comment.created%> </div>
+<% } %>
+<% if ( user && user.user_id === comment.user_id ) { %>
+<div class="button-line">
+  <a class="edit-comment-button edit-button" data-i="<%= comment.comment_id %>"><i class="bi bi-pencil"></i>Edit</a>
+  <form class="delete-comment-button" action="<%=urlRoot%>/api/maps/<%=map.map_id%>/comments/<%= comment.comment_id %>?_method=DELETE" method="POST">
+  <button class="edit-button" data-i="<%= comment.comment_id %>"><i class="bi bi-trash"></i>Delete</button>
+  <input type="hidden" name="redirect" value="<%=redirect%>" />
+  </form>
+</div>
+  <div class="comment-edit">
+    <form action="<%=urlRoot%>/api/maps/<%= map.map_id %>/comments/<%= comment.comment_id %>?_method=PUT" method="POST">
+      <textarea id="text" name="text"></textarea>
+      <input type="hidden" name="redirect" value="<%=redirect%>" />
+      <button>submit</button>
+    </form>
+  </div>
+<% } %>
+<% } else { %>
+<div class="comment-deleted-message"> This comment has been deleted. </div>
+<% } %>
+</div>

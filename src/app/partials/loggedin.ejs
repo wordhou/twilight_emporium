@@ -1,8 +1,10 @@
 <% if (user) { %>
-  Logged in as <%= user.display_name %>
-  <a href="/auth/logout" class="logout-button">Log out</a>
-<% } else {%>
-  <a href="/auth?redirect=<%= redirect %>" class="login-button"> Log in with Google
     <i class="bi bi-google"></i>
+Logged in as <%= user.display_name %>
+  <a href="<%=urlRoot%>/auth/logout" class="logout-button">Log out</a>
+<% } else {%>
+<a href="<%=urlRoot%>/auth?redirect=<%= redirect %>" class="login-button"> 
+    <i class="bi bi-google"></i>
+  Log in with Google
   </a>
 <% }%>

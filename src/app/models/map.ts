@@ -7,6 +7,7 @@ export interface MapData {
   created?: string;
   user_id?: number;
   map_name: string;
+  published: boolean;
   versions: string[];
   description: string;
 }
@@ -24,6 +25,7 @@ class TwilightMap {
     versions,
     created,
     map_name = "",
+    published = false,
   }: MapData) {
     this.map_id = map_id;
     this.created = created;
@@ -31,14 +33,21 @@ class TwilightMap {
     this.description = description;
     this.versions = versions;
     this.map_name = map_name;
+    this.published = published;
   }
 
   async save(): Promise<this> {
     if (this.map_id === undefined) {
       const result = await db.query(
-        `INSERT INTO maps(user_id, description, versions, map_name)
-        VALUES ($1, $2, $3, $4) RETURNING map_id, created;`,
-        [this.user_id, this.description, this.versions, this.map_name]
+        `INSERT INTO maps(user_id, description, versions, map_name, published)
+        VALUES ($1, $2, $3, $4, $5) RETURNING map_id, created;`,
+        [
+          this.user_id,
+          this.description,
+          this.versions,
+          this.map_name,
+          this.published,
+        ]
       );
       this.map_id = result.rows[0].map_id;
       this.created = result.rows[0].created;
@@ -47,9 +56,16 @@ class TwilightMap {
         `UPDATE maps SET
           description = $1,
           versions = $2,
-          map_name = $3
-        WHERE map_id = $4;`,
-        [this.description, this.versions, this.map_name, this.map_id]
+          map_name = $3,
+          published = $4
+        WHERE map_id = $5;`,
+        [
+          this.description,
+          this.versions,
+          this.map_name,
+          this.published,
+          this.map_id,
+        ]
       );
     }
     return this;
@@ -63,6 +79,7 @@ class TwilightMap {
       versions: this.versions,
       description: this.description,
       created: this.created,
+      published: this.published,
     };
   }
 
@@ -82,12 +99,15 @@ class TwilightMap {
   modify({
     map_name,
     description,
+    published,
   }: {
     map_name?: string;
     description?: string;
+    published?: boolean;
   }): this {
     if (map_name !== undefined) this.map_name = map_name;
     if (description !== undefined) this.description = description;
+    if (published !== undefined) this.published = published;
     return this;
   }
 
@@ -133,14 +153,22 @@ class TwilightMap {
     user_id,
     description,
     map_name,
+    published = false,
     versions = [],
   }: {
     user_id: number;
     description: string;
     map_name: string;
+    published: boolean;
     versions?: string[];
   }): Promise<TwilightMap> {
-    const map = new TwilightMap({ user_id, description, map_name, versions });
+    const map = new TwilightMap({
+      user_id,
+      description,
+      map_name,
+      versions,
+      published,
+    });
     await map.save();
     return map;
   }
@@ -160,6 +188,7 @@ class TwilightMap {
           map_name VARCHAR(255) NOT NULL,
           description text,
           versions text[],
+          published boolean default false,
           created timestamp default current_timestamp,
           updated timestamp default current_timestamp,
           CONSTRAINT fk_maps
@@ -167,15 +196,52 @@ class TwilightMap {
               REFERENCES users(user_id)
           );`
     );
+    await db.query(
+      `CREATE OR REPLACE FUNCTION update_modified_column()   
+  RETURNS TRIGGER AS $$
+  BEGIN
+      NEW.updated = now();
+      RETURN NEW;   
+  END;
+  $$ language 'plpgsql';`
+    );
+    await db.query(`DROP TRIGGER update_customer_modtime ON maps`);
+    await db.query(
+      `CREATE TRIGGER update_customer_modtime BEFORE UPDATE ON maps FOR EACH ROW EXECUTE PROCEDURE  update_modified_column();`
+    );
   }
 
-  static async query(): Promise<Array<TwilightMap>> {
-    const result = await db.query(
-      `select m.map_id, m.map_name, m.description, m.created, m.updated, u.display_name
-      from maps m
-      INNER JOIN users u on m.user_id = u.user_id`,
-      []
-    );
+  static async query(
+    visible_to?: number,
+    author?: number
+  ): Promise<Array<TwilightMap>> {
+    let result;
+    if (visible_to === author && author !== undefined) {
+      result = await db.query(
+        `select m.map_id, m.map_name, m.description, m.created, m.updated, m.versions, m.user_id, m.published, u.display_name
+        from maps m
+        INNER JOIN users u on m.user_id = u.user_id
+        WHERE m.user_id = $1;`,
+        [author]
+      );
+    } else if (visible_to !== undefined) {
+      result = await db.query(
+        `select m.map_id, m.map_name, m.description, m.created, m.updated, m.versions, m.user_id, m.published, u.display_name
+        from maps m
+        INNER JOIN users u on m.user_id = u.user_id
+        WHERE m.published = True
+        OR m.user_id = $1;`,
+        [visible_to]
+      );
+    } else {
+      result = await db.query(
+        `select m.map_id, m.map_name, m.description, m.created, m.updated, m.versions, m.user_id, u.display_name, m.published
+        from maps m
+        INNER JOIN users u on m.user_id = u.user_id
+        WHERE m.published = True;`,
+        []
+      );
+    }
     return result.rows;
   }
 }

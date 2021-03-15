@@ -5,23 +5,24 @@ const urlRoot = process.env["URL_ROOT"] || "http://localhost:3000";
 
 const router = Router();
 
-router.get("/helloworld", async (req, res) => {
-  if (req.isAuthenticated()) {
-    res.send(`hello ${JSON.stringify(req.user)}`);
-  } else {
-    res.send(`hello world, ${JSON.stringify(req.user)}`);
-  }
+router.get("/", async (req, res) => {
+  const user = req.user as User | undefined;
+  const redirect = req.originalUrl;
+  res.render("home", { user, redirect, urlRoot });
 });
 
 router.get("/maps/:id", async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
   await map.populate();
-  const user = req.user as User;
-  const userOwnsMap = req.isAuthenticated() && user.user_id === map.user_id;
-  const redirect = req.originalUrl;
-  console.log(req.path);
-  res.render("map", { map, user, urlRoot, userOwnsMap, redirect });
+  const user = req.user as User | undefined;
+  const userOwnsMap = user && user.user_id === map.user_id;
+  if (!map.published && (!user || user.user_id !== map.user_id)) {
+    res.redirect("/");
+  } else {
+    const redirect = req.originalUrl;
+    res.render("map", { map, user, urlRoot, userOwnsMap, redirect });
+  }
 });
 
 router.get("/editor", async (req, res) => {
@@ -39,8 +40,31 @@ router.get("/editor", async (req, res) => {
 });
 
 router.get("/maps", async (req, res) => {
-  const maps = await TwilightMap.query();
-  res.render("maps", { maps, urlRoot });
+  const user = req.user as User | undefined;
+  const user_id = user !== undefined ? user.user_id : undefined;
+  const maps = await TwilightMap.query(user_id);
+  res.render("maps", {
+    user,
+    maps,
+    urlRoot,
+    redirect: req.originalUrl,
+  });
+});
+
+router.get("/yourmaps", async (req, res) => {
+  const user = req.user as User | undefined;
+  if (user === undefined) {
+    res.redirect("/");
+  } else {
+    const user_id = user !== undefined ? user.user_id : undefined;
+    const maps = await TwilightMap.query(user_id, user_id);
+    res.render("maps", {
+      user: req.user,
+      maps,
+      urlRoot,
+      redirect: req.originalUrl,
+    });
+  }
 });
 
 export default router;

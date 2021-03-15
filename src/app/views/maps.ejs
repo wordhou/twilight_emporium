@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+  <head>
+  <%- include('../partials/head'); %>
+  <link rel="stylesheet" href="maps.css">
+  </head>
+  <body>
+  <header><%- include('../partials/header'); %></header>
+    <main class="map-listing-wrapper">
+      <% maps.forEach( map => { %>
+        <%- include('../partials/map-listing', {map}); %>
+      <% }); %>
+      <% if (maps.length === 0) { %>
+        <div class="map-listing">
+          You don't have any maps yet. <a href="<%=urlRoot%>/editor">Make a new map</a>
+        </div>
+      <% } %>
+    </main>
+    <footer> <%- include('../partials/footer'); %></footer>
+  </body>
+</html>

@@ -1,45 +1,61 @@
 <!doctype html>
 <html>
   <head>
+  <link rel="stylesheet" href="../map.css">
   <%- include('../partials/head'); %>
-  <script type="text/javascript" src="../map.js"></script>
+  <script type="text/javascript" src="../map.js" defer></script>
   </head>
   <body>
   <header><%- include('../partials/header'); %></header>
-
+  <main>
     <section class="map">
-      <header class="section-map-header">
-      <h2>Twilight Emperium Map Name: <%= map.map_name; %></h2>
-      <h3>Author: <%= map.author.display_name %></h3>
+      <header class="map-header">
+        <h1>
+          <% if (user && user.user_id === map.user_id && map.published === false ) {%> Unpublished map: <% } else {%> Map name: <% } %>
+          <%= map.map_name; %>
+          <% if (user && user.user_id === map.user_id) { %>
+            <a class="edit-button" id="edit-map-name"><i class="bi bi-pencil"></i>Edit map name</a>
+          <% } %>
+        </h1>
+        <div class="map-name-editor">
+          <form action="<%=urlRoot%>/api/maps/<%=map.map_id%>?_method=PUT" method="POST">
+            <input name="map_name" value="<%=map.map_name%>"></input> <button class="edit-button">Done</button>
+            <input type="hidden" name="redirect" value="<%=redirect%>" />
+          </form>
+        </div>
+      <h2>Author: <%= map.author.display_name %></h2>
       </header>
 
       <div class="map-image-wrapper">
-      <img src="/api/maps/<%= map.map_id %>/latest/large.jpg">
+        <% if (map.versions.length > 0) {%>
+        <img class="map-image" src="<%=urlRoot%>/api/maps/<%= map.map_id %>/latest/large.jpg">
+        <% } else { %>
+        <div class="map-image-placeholder">No map content here yet</div>
+        <% } %>
       </div>
 
       <section class="map-description">
-        Map description: <%= map.description; %>
+        <h1>Map description</h1>
+        <%= map.description; %>
+
+        <nav class="button-line">
+          <% if (user && user.user_id === map.user_id) { %>
+            <a class="edit-button" id="edit-description"><i class="bi bi-pencil"></i>Edit description</a>
+            <a class="edit-button" href="<%=urlRoot%>/editor?map_id=<%=map.map_id%>"><i class="bi bi-palette"></i>Edit map in editor</a>
+            <%- include('../partials/publish', {user, map}); %>
+          <% } %>
+        </nav>
+        <div class="description-editor">
+          <form action="<%=urlRoot%>/api/maps/<%=map.map_id%>?_method=PUT" method="POST">
+            <textarea name="description" value="<%=map.map_name%>"></textarea> <button class="edit-button">Done</button>
+            <input type="hidden" name="redirect" value="<%=redirect%>" />
+          </form>
+        </div>
       </section>
     </section>
     <section class="map-comments">
       <% map.comments.forEach( comment => { %>
-        <div id="comment-<%= comment.comment_id%>">
-        <h1> Posted by <%= comment.user.display_name %> </h1>
-        <h2> on <%= comment.created %> </h2>
-        <%= comment.text %>
-        <% if ( user && user.user_id === comment.user_id ) { %>
-          <a href="#" onclick="toggleEdit(<%= comment.comment_id %>)"> Edit </a>
-          <div class="comment-edit">
-            <form action="/api/maps/<%= map.map_id %>/comments/<%= comment.comment_id %>" method="get">
-              <label for="text">Text:</label>
-              <textarea id="text" name="text"></textarea>
-              <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
-              <input type="hidden" name="_method" value="post" />
-              <button>submit</button>
-            </form>
-          </div>
-        <% } %>
-      </div>
+        <%- include('../partials/comment', {user, map, comment, urlRoot, redirect}); %>
       <% }); %>
     </section>
 
@@ -48,13 +64,14 @@
       <form action="/api/maps/<%= map.map_id %>/comments" method="post">
         <label for="text">Text:</label>
         <textarea id="text" name="text"></textarea>
-        <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
+        <input type="hidden" name="redirect" value="<%=redirect%>" />
         <button>submit</button>
       </form>
       <% } else { %>
       <a href="/auth?redirect=<%= redirect %>">Log in</a> to post comments.
       <% } %>
     </section>
-  <footer <%- include('../partials/footer'); %></footer>
+  </main>
+  <footer><%- include('../partials/footer'); %></footer>
   </body>
 </html>

@@ -78,9 +78,10 @@ class Comment {
 
   async delete(): Promise<void> {
     this.deleted = true;
-    await db.query(`UPDATE comment SET deleted = true WHERE comment_id = $1;`, [
-      this.comment_id,
-    ]);
+    await db.query(
+      `UPDATE comments SET deleted = true WHERE comment_id = $1;`,
+      [this.comment_id]
+    );
   }
 
   static async get(comment_id: number): Promise<Comment> {

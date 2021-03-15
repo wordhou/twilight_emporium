@@ -67,7 +67,11 @@ class MapCompositor {
       .toBuffer();
   }
 
-  async drawTTSMap(tts: string, size?: number): Promise<Buffer> {
+  async drawTTSMap(
+    tts: string,
+    size?: number,
+    color = "#000000"
+  ): Promise<Buffer> {
     if (this.ready === false) throw new Error(`MapCompositor not initiated`);
     const map = TIMapArray.fromTTSString(tts);
     if (map instanceof Error) throw new Error(`Map string is invalid TTS map`);
@@ -91,11 +95,11 @@ class MapCompositor {
         width: Math.round(boardWidth),
         height: Math.round(boardHeight),
         channels: 4,
-        background: MapCompositor.transparent,
+        background: color,
       },
     })
       .composite(images)
-      .jpeg({ quality: 60 })
+      .jpeg({ quality: 80 })
       .toBuffer();
     return await sharp(img).resize(size).toBuffer();
   }

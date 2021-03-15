@@ -130,7 +130,6 @@ class Editor {
 
     unusedTiles.addEventListener("dragstart", (ev) => {
       const el = ev.target;
-      console.log(el);
       if (!(el instanceof HTMLElement) || !el.classList.contains("unused-tile"))
         return null;
       ev.stopPropagation();
