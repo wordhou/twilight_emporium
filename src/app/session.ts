@@ -1,11 +1,8 @@
 import session from "express-session";
 import ConnectPgSimple from "connect-pg-simple";
 import db, { dbPool } from "./db";
+import { sessionSecret } from "./config";
 const pgSession = ConnectPgSimple(session);
-
-const sessionSecret = process.env["SESSION_SECRET"];
-if (sessionSecret === undefined)
-  throw new Error("Env variable SESSION_SECRET is undefined");
 
 async function createSessionsTable(): Promise<void> {
   const exists = await db.tableExists("session");

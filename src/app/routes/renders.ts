@@ -1,7 +1,6 @@
 import Router from "express-promise-router";
 import { TwilightMap, User, MapComment } from "../models";
-
-const urlRoot = process.env["URL_ROOT"] || "http://localhost:3000";
+import { urlRoot } from "../config";
 
 const router = Router();
 
