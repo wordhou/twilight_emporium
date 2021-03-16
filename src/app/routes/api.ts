@@ -4,7 +4,6 @@ import { NextFunction, Request, Response } from "express";
 
 import MapCompositor from "../../compositor";
 const compositor = new MapCompositor("public/tiles/large/", 364, 317);
-compositor.init();
 
 const api = Router();
 
@@ -48,7 +47,11 @@ api.get("/maps/:id/latest/large.jpg", async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
   const latest = map.versions[map.versions.length - 1];
-  const jpg = await compositor.drawTTSMap(latest, 1000, "#dde5ea");
+  const jpg = await compositor.drawTTSMap({
+    tts: latest,
+    scale: 0.5,
+    color: "#dde5ea",
+  });
   res.type("jpg").send(jpg);
 });
 
@@ -56,7 +59,11 @@ api.get("/maps/:id/latest/small.jpg", async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
   const latest = map.versions[map.versions.length - 1];
-  const jpg = await compositor.drawTTSMap(latest, 250, "#dde5ea");
+  const jpg = await compositor.drawTTSMap({
+    tts: latest,
+    size: 250,
+    color: "#dde5ea",
+  });
   res.type("jpg").send(jpg);
 });
 

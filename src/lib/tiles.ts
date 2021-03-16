@@ -42,6 +42,7 @@ function getName(t: Tile): string {
   const n = getNumber(t);
   const f = getFace(t);
   if (n === NEG_ONE) return "-1";
+  if (n < 83) return `${n}`;
   return `${n}${f !== undefined ? f : ""}`;
 }
 

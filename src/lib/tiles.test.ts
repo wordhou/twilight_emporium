@@ -16,9 +16,10 @@ const newTileParams: [number, rotation, face][] = [
   [84, 4, "B"],
   [-1, undefined, undefined],
   [88, undefined, "B"],
+  [0, undefined, undefined],
 ];
 
-const TTSStrings = ["5", "5-4", "83A-0", "84B-4", "-1", "88B"];
+const TTSStrings = ["5", "5-4", "83A-0", "84B-4", "-1", "88B", "0"];
 
 describe("getNumber", () => {
   test("gets number", () => {
@@ -97,7 +98,7 @@ describe("fromTTSString", () => {
     expect(params).toStrictEqual(newTileParams);
   });
 });
-
+/*
 describe("rotate", () => {
   const rs = [-1, 0, 1, 10];
   const rotated = [
@@ -118,3 +119,4 @@ describe("rotate", () => {
     expect(rotated_).toStrictEqual(rotated);
   });
 });
+*/
