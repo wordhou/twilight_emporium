@@ -1,16 +1,15 @@
-import sharp from "sharp";
 import * as fs from "fs";
+import path from "path";
+import sharp from "sharp";
 import * as Hex from "../lib/hex";
-import TIMapArray from "../lib/twilightmap";
 import Tiles from "../lib/tiles";
+import TIMapArray from "../lib/twilightmap";
 import { rotation } from "../types";
 
 class MapCompositor {
   static transparent = { r: 0, b: 0, g: 0, alpha: 0 };
   static HRT3 = 0.8660254037844386;
   tilesDir: string;
-  cachedImages: Map<string | undefined, Buffer>;
-  ready: boolean;
   tileWidth: number;
   tileHeight: number;
   rotLeftOffset: number;
@@ -18,8 +17,6 @@ class MapCompositor {
 
   constructor(tilesDir: string, width: number, height?: number) {
     this.tilesDir = tilesDir;
-    this.cachedImages = new Map();
-    this.ready = false;
     this.tileWidth = width;
     this.tileHeight = height === undefined ? width * MapCompositor.HRT3 : 317;
     const rotWidth =
@@ -31,27 +28,12 @@ class MapCompositor {
   }
 
   async init(): Promise<this> {
-    await this.preloadBuffers(this.cachedImages);
-    this.ready = true;
     return this;
   }
 
-  async preloadBuffers(map: Map<string | undefined, Buffer>): Promise<void> {
-    const files = await fs.promises.readdir(this.tilesDir);
-    await Promise.all(
-      files.map(async (file) => {
-        const re = /ST_(-?[0-9a-zAB_]+).png/.exec(file);
-        if (re === null)
-          throw new Error(`regex does not match map tile ${file}`);
-        const name = re[1] === "undefined" ? undefined : re[1];
-        const buf = await sharp(this.tilesDir + file).toBuffer();
-        map.set(name, buf);
-      })
-    );
-  }
-
-  async rotateBuffer(buf: Buffer, r: rotation): Promise<Buffer> {
-    if (r === undefined || r === 0) return buf;
+  async getBuffer(tileName: string, r: rotation): Promise<Buffer | string> {
+    const imgPath = path.join(this.tilesDir, `ST_${tileName}.png`);
+    if (r === undefined || r === 0) return imgPath;
     const extractOptions =
       r % 3 === 0
         ? { left: 0, top: 0, width: this.tileWidth, height: this.tileHeight }
@@ -61,7 +43,7 @@ class MapCompositor {
             width: this.tileWidth,
             height: this.tileHeight,
           };
-    return sharp(buf)
+    return sharp(imgPath)
       .rotate(60 * r, { background: MapCompositor.transparent })
       .extract(extractOptions)
       .toBuffer();
@@ -72,19 +54,15 @@ class MapCompositor {
     size?: number,
     color = "#000000"
   ): Promise<Buffer> {
-    if (this.ready === false) throw new Error(`MapCompositor not initiated`);
     const map = TIMapArray.fromTTSString(tts);
     if (map instanceof Error) throw new Error(`Map string is invalid TTS map`);
     const boardWidth = this.tileWidth * (1 + 1.5 * map.rings);
     const boardHeight = this.tileHeight * (1 + 2 * map.rings);
     const images = await Promise.all(
       Array.from(map.board).map(async (t, i) => {
-        const buf = this.cachedImages.get(Tiles.getName(t));
-        if (buf === undefined)
-          throw new Error(`no tile with name ${Tiles.getName(t)}`);
         const [x, y] = Hex.spiralToXY(i, this.tileWidth, this.tileHeight);
         return {
-          input: await this.rotateBuffer(buf, Tiles.getRotation(t)),
+          input: await this.getBuffer(Tiles.getName(t), Tiles.getRotation(t)),
           top: Math.round(0.5 * boardHeight - 0.5 * this.tileHeight - y),
           left: Math.round(0.5 * boardWidth - 0.5 * this.tileWidth + x),
         };
