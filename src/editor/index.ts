@@ -31,6 +31,3 @@ const editor = new Editor({
 });
 
 editor.render(document.getElementById("editor-app") as HTMLElement);
-
-// DEBUG
-//
