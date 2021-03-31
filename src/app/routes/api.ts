@@ -46,14 +46,17 @@ api.post("/maps/:id/copy", requireAuth, async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
   const { map_name, description, published, versions } = map;
-  const copy = await TwilightMap.create({
+
+  const newMapData = {
     user_id,
     description,
     map_name: `Copy of ${map_name}`,
     published,
     newVersion: versions[versions.length - 1],
-  });
-  if (goToEditor) res.redirect(`/editor?map_id=${map.map_id}`);
+  };
+  console.log(newMapData);
+  const copy = await TwilightMap.create(newMapData);
+  if (goToEditor) res.redirect(`/editor?map_id=${copy.map_id}`);
   else res.json(copy);
 });
 

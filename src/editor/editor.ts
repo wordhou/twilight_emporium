@@ -50,6 +50,7 @@ class Editor {
   };
 
   constructor(s: Settings) {
+    console.log(s.initial);
     this.editHistory = this._initializeEditHistory(s.initial);
     this.mapData = s.mapData || DEFAULT_SETTINGS.mapData;
     this.userData = s.userData;
@@ -60,7 +61,6 @@ class Editor {
       selection: [],
       dropTarget: [],
     };
-    console.log(this.mapData);
     this.components = {
       editorControls: new EditorControls(this),
       tileSelector: new TileSelector(this),

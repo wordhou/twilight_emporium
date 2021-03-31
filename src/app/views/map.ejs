@@ -40,10 +40,11 @@
 
         <nav class="button-line">
           <% if (user && user.user_id === map.user_id) { %>
-            <a class="edit-button" id="edit-description"><i class="bi bi-pencil"></i>Edit description</a>
-            <a class="edit-button" href="<%=urlRoot%>/editor?map_id=<%=map.map_id%>"><i class="bi bi-palette"></i>Edit map in editor</a>
+            <a class="edit-button" id="edit-description"><i class="bi bi-pencil"></i> Edit description</a>
+            <a class="edit-button" href="<%=urlRoot%>/editor?map_id=<%=map.map_id%>"><i class="bi bi-palette"></i> Edit map in editor</a>
             <%- include('../partials/publish', {user, map}); %>
           <% } %>
+          <%- include('../partials/edit-copy', {user, map}); %>
         </nav>
         <div class="description-editor">
           <form action="<%=urlRoot%>/api/maps/<%=map.map_id%>?_method=PUT" method="POST">
