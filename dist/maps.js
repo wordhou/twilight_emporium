@@ -150,14 +150,14 @@ eval("\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nfunc
 
 /***/ }),
 
-/***/ "./src/app/views/map.ts":
-/*!******************************!*\
-  !*** ./src/app/views/map.ts ***!
-  \******************************/
+/***/ "./src/app/views/maps.ts":
+/*!*******************************!*\
+  !*** ./src/app/views/maps.ts ***!
+  \*******************************/
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
 "use strict";
-eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nvar _a, _b;\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\n//import $ from \"jquery\";\nconst delete_map_1 = __importDefault(__webpack_require__(/*! ../partials/delete-map */ \"./src/app/partials/delete-map.ts\"));\ndelete_map_1.default();\ndocument.querySelectorAll(\".edit-comment-button\").forEach((a) => {\n    const i = parseInt(a.dataset.i);\n    a.addEventListener(\"click\", () => {\n        var _a;\n        const comment = document.getElementById(`comment-${i}`);\n        (_a = comment === null || comment === void 0 ? void 0 : comment.querySelector(\".comment-edit\")) === null || _a === void 0 ? void 0 : _a.classList.toggle(\"on\");\n    });\n});\nconst mapNameEditor = document.querySelector(\".map-name-editor\");\n(_a = document.getElementById(\"edit-map-name\")) === null || _a === void 0 ? void 0 : _a.addEventListener(\"click\", () => {\n    mapNameEditor.classList.toggle(\"on\");\n});\nconst descriptionEditor = document.querySelector(\".description-editor\");\n(_b = document.getElementById(\"edit-description\")) === null || _b === void 0 ? void 0 : _b.addEventListener(\"click\", () => {\n    descriptionEditor.classList.toggle(\"on\");\n});\n\n\n//# sourceURL=webpack://twilight_emporium/./src/app/views/map.ts?");
+eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst delete_map_1 = __importDefault(__webpack_require__(/*! ../partials/delete-map */ \"./src/app/partials/delete-map.ts\"));\ndelete_map_1.default();\n\n\n//# sourceURL=webpack://twilight_emporium/./src/app/views/maps.ts?");
 
 /***/ }),
 
@@ -416,7 +416,7 @@ eval("var map = {\n\t\"./log\": \"./node_modules/webpack/hot/log.js\"\n};\n\n\nf
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	__webpack_require__("./src/app/views/map.ts");
+/******/ 	__webpack_require__("./src/app/views/maps.ts");
 /******/ 	var __webpack_exports__ = __webpack_require__("./node_modules/webpack-dev-server/client/index.js?http://localhost:8080");
 /******/ 	
 /******/ })()

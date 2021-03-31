@@ -18,11 +18,12 @@
     <div class="button-line">
       <% if (user && map.user_id === user.user_id) { %>
       <a class="edit-button" href="editor?map_id=<%=map.map_id%>">
-        <i class="bi bi-palette"></i>
-        Edit map!
+        <i class="bi bi-palette"></i> Edit map!
       </a>
-      <%- include('../partials/publish', {user, map}); %>
+      <%- include('../partials/publish-map', {user, map}); %>
+      <%- include('../partials/delete-map', {user, map}); %>
       <% } %>
+      <%- include('../partials/edit-copy', {user, map}); %>
     </div>
   </div>
 </section>

@@ -1,14 +1,9 @@
 //import $ from "jquery";
+import attachDeleteMapHandler from "../partials/delete-map";
+
+attachDeleteMapHandler();
 
 document.querySelectorAll(".edit-comment-button").forEach((a) => {
-  const i = parseInt((a as HTMLElement).dataset.i as string);
-  a.addEventListener("click", () => {
-    const comment = document.getElementById(`comment-${i}`);
-    comment?.querySelector(".comment-edit")?.classList.toggle("on");
-  });
-});
-
-document.querySelectorAll("comment-button").forEach((a) => {
   const i = parseInt((a as HTMLElement).dataset.i as string);
   a.addEventListener("click", () => {
     const comment = document.getElementById(`comment-${i}`);

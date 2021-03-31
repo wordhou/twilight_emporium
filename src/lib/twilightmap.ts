@@ -26,6 +26,7 @@ class TIMapArray implements State {
       this.board[0] = Tiles.fromTTSString("18") as number;
     }
   }
+
   clone(): this {
     return new TIMapArray(this.board) as this;
   }
@@ -152,16 +153,18 @@ class TIMapArray implements State {
     return [];
   }
 
-  toTTSString(): string {
+  toTTSString(useCommas?: boolean): string {
     const tiles =
       Tiles.getNumber(this.board[0]) === 18
         ? Array.from(this.board.slice(1))
         : Array.from(this.board);
-    return tiles.map((t) => Tiles.toTTSString(t)).join(" ");
+    return useCommas
+      ? tiles.map((t) => Tiles.toTTSString(t)).join(",")
+      : tiles.map((t) => Tiles.toTTSString(t)).join(" ");
   }
 
   static fromTTSString(tts: string): Result<TIMapArray> {
-    const ttsTiles = tts.split(" "); // TODO what if they use commas?
+    const ttsTiles = tts.includes(",") ? tts.split(",") : tts.split(" ");
     if (!/18(-[0-5])?/.test(ttsTiles[0])) ttsTiles.unshift("18");
     const board = new Uint16Array(ttsTiles.length);
     for (let i = 0; i < ttsTiles.length; i++) {

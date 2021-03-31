@@ -138,7 +138,8 @@ figure > figcaption {
 
 .button-line {
   display: flex;
-  flex-flow: row nowrap;
+  flex-flow: row wrap;
+  align-items: baseline;
 }
 
 .button-line a,

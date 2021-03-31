@@ -1,0 +1,6 @@
+<form action="<%=urlRoot%>/api/maps/<%=map.map_id%>?_method=DELETE" method="POST" data-i="<%=map.map_id%>" class="delete-form">
+    <button class="edit-button" type="button" href="">
+      <i class="bi bi-trash"></i> Delete map
+    </button>
+    <input type="hidden" name="redirect" value="/yourmaps" />
+</form>
