@@ -24,7 +24,7 @@ api.get("/maps", async (req, res) => {
 });
 
 api.post("/maps", requireAuth, async (req, res) => {
-  const { map_name, description, published, newVersion } = req.body;
+  const { goToEditor, map_name, description, published, newVersion } = req.body;
   const user_id = (req.user as User).user_id;
   if (user_id === undefined) throw new Error("User has no user_id");
   const map = await TwilightMap.create({
@@ -34,12 +34,28 @@ api.post("/maps", requireAuth, async (req, res) => {
     published,
     newVersion,
   });
-  res.json(map);
+  if (goToEditor) res.redirect(`/editor?map_id=${map.map_id}`);
+  else res.json(map);
 });
 
-api.post("/maps/:id/copy", async (req, res) => {
+/** Makes a copy of the map with a given id */
+api.post("/maps/:id/copy", requireAuth, async (req, res) => {
   const user_id = (req.user as User).user_id;
-  // TODO
+  const { goToEditor } = req.body;
+  if (user_id === undefined) throw new Error("User has no user_id");
+  const map_id = parseInt(req.params.id);
+  const map = await TwilightMap.get(map_id);
+  const { map_name, description, published, versions } = map;
+  const copy = await TwilightMap.create({
+    user_id,
+    description,
+    map_name: `Copy of ${map_name}`,
+    published,
+    newVersion: versions[versions.length - 1],
+  });
+  res.json(copy);
+  if (goToEditor) res.redirect(`/editor?map_id=${map.map_id}`);
+  else res.json(map);
 });
 
 api.get("/maps/:id", async (req, res) => {
