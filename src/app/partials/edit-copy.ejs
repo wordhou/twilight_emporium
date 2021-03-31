@@ -1,6 +1,8 @@
-  <form action="<%=urlRoot%>/api/maps/<%=map.map_id%>/copy" method=POST>
+<% if (user !== undefined) { %>
+<form action="<%=urlRoot%>/api/maps/<%=map.map_id%>/copy" method=POST>
     <button class="edit-button" href=""><i class="bi bi-clipboard-plus"></i> Edit a copy</button>
     <input type="hidden" name="redirect" value="/maps/<%= map.map_id %>" />
     <input type="hidden" name="goToEditor" value="true" />
     <input type="hidden" name="published" value="true" />
 </form>
+<% } >
