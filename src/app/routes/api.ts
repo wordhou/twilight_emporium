@@ -53,15 +53,24 @@ api.post("/maps/:id/copy", requireAuth, async (req, res) => {
     published,
     newVersion: versions[versions.length - 1],
   });
-  res.json(copy);
   if (goToEditor) res.redirect(`/editor?map_id=${map.map_id}`);
-  else res.json(map);
+  else res.json(copy);
 });
 
 api.get("/maps/:id", async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
   res.json(map.getData());
+});
+
+api.delete("/maps/:id", async (req, res) => {
+  console.log("HITTING DELETE API!");
+  const map_id = parseInt(req.params.id);
+  const { redirect } = req.body;
+  const map = await TwilightMap.get(map_id);
+  await map.delete();
+  if (redirect !== undefined) res.redirect(redirect);
+  else res.send("Success");
 });
 
 api.get("/maps/:id/latest/large.jpg", async (req, res) => {

@@ -111,6 +111,11 @@ class TwilightMap {
     return this;
   }
 
+  async delete() {
+    await db.query(`delete from maps where map_id = $1`, [this.map_id]);
+    // TODO: if result is bad, throw new Error("message");
+  }
+
   async populate(): Promise<void> {
     const comments = await db.query(
       `select c.*, u.google_id, u.display_name

@@ -8,11 +8,16 @@ document.querySelectorAll(".edit-comment-button").forEach((a) => {
   });
 });
 
-document.querySelectorAll("comment-button").forEach((a) => {
+console.log("maps.ts line 11");
+document.querySelectorAll("delete-button").forEach((a) => {
+  console.log("attaching event handel to delete button");
   const i = parseInt((a as HTMLElement).dataset.i as string);
+  const form = document.getElementById(`delete-${i}`) as
+    | HTMLFormElement
+    | undefined;
   a.addEventListener("click", () => {
-    const comment = document.getElementById(`comment-${i}`);
-    comment?.querySelector(".comment-edit")?.classList.toggle("on");
+    const yes = confirm(`Are you sure you want to delete the map?`);
+    if (yes) form?.submit();
   });
 });
 

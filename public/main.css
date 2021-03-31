@@ -139,6 +139,7 @@ figure > figcaption {
 .button-line {
   display: flex;
   flex-flow: row nowrap;
+  align-items: baseline;
 }
 
 .button-line a,

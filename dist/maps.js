@@ -139,14 +139,25 @@ eval("/* sockjs-client v1.5.0 | http://sockjs.org | MIT license */\n(function(f)
 
 /***/ }),
 
-/***/ "./src/app/views/map.ts":
-/*!******************************!*\
-  !*** ./src/app/views/map.ts ***!
-  \******************************/
-/***/ (() => {
+/***/ "./src/app/partials/delete-map.ts":
+/*!****************************************!*\
+  !*** ./src/app/partials/delete-map.ts ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
-eval("\n//import $ from \"jquery\";\nvar _a, _b;\ndocument.querySelectorAll(\".edit-comment-button\").forEach((a) => {\n    const i = parseInt(a.dataset.i);\n    a.addEventListener(\"click\", () => {\n        var _a;\n        const comment = document.getElementById(`comment-${i}`);\n        (_a = comment === null || comment === void 0 ? void 0 : comment.querySelector(\".comment-edit\")) === null || _a === void 0 ? void 0 : _a.classList.toggle(\"on\");\n    });\n});\nconsole.log(\"maps.ts line 11\");\ndocument.querySelectorAll(\"delete-button\").forEach((a) => {\n    console.log(\"attaching event handel to delete button\");\n    const i = parseInt(a.dataset.i);\n    const form = document.getElementById(`delete-${i}`);\n    a.addEventListener(\"click\", () => {\n        const yes = confirm(`Are you sure you want to delete the map?`);\n        if (yes)\n            form === null || form === void 0 ? void 0 : form.submit();\n    });\n});\nconst mapNameEditor = document.querySelector(\".map-name-editor\");\n(_a = document.getElementById(\"edit-map-name\")) === null || _a === void 0 ? void 0 : _a.addEventListener(\"click\", () => {\n    mapNameEditor.classList.toggle(\"on\");\n});\nconst descriptionEditor = document.querySelector(\".description-editor\");\n(_b = document.getElementById(\"edit-description\")) === null || _b === void 0 ? void 0 : _b.addEventListener(\"click\", () => {\n    descriptionEditor.classList.toggle(\"on\");\n});\n\n\n//# sourceURL=webpack://twilight_emporium/./src/app/views/map.ts?");
+eval("\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nfunction attachDeleteMapHandler() {\n    document.querySelectorAll(\".delete-form\").forEach((form) => {\n        const a = form.querySelector(\"button\");\n        a === null || a === void 0 ? void 0 : a.addEventListener(\"click\", () => {\n            var _a;\n            const yes = confirm(`Are you sure you want to delete the map?`);\n            if (yes)\n                (_a = form) === null || _a === void 0 ? void 0 : _a.submit();\n        });\n    });\n}\nexports.default = attachDeleteMapHandler;\n\n\n//# sourceURL=webpack://twilight_emporium/./src/app/partials/delete-map.ts?");
+
+/***/ }),
+
+/***/ "./src/app/views/maps.ts":
+/*!*******************************!*\
+  !*** ./src/app/views/maps.ts ***!
+  \*******************************/
+/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+
+"use strict";
+eval("\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst delete_map_1 = __importDefault(__webpack_require__(/*! ../partials/delete-map */ \"./src/app/partials/delete-map.ts\"));\ndelete_map_1.default();\n\n\n//# sourceURL=webpack://twilight_emporium/./src/app/views/maps.ts?");
 
 /***/ }),
 
@@ -404,8 +415,8 @@ eval("var map = {\n\t\"./log\": \"./node_modules/webpack/hot/log.js\"\n};\n\n\nf
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	// This entry module can't be inlined because the eval devtool is used.
-/******/ 	__webpack_require__("./src/app/views/map.ts");
+/******/ 	// This entry module is referenced by other modules so it can't be inlined
+/******/ 	__webpack_require__("./src/app/views/maps.ts");
 /******/ 	var __webpack_exports__ = __webpack_require__("./node_modules/webpack-dev-server/client/index.js?http://localhost:8080");
 /******/ 	
 /******/ })()

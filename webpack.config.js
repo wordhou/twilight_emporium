@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     editor: "./src/editor/index.ts",
     map: "./src/app/views/map.ts",
+    maps: "./src/app/views/maps.ts",
   },
   mode: isProduction ? "production" : "development",
   module: {
