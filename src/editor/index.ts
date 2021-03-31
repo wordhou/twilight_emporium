@@ -24,8 +24,13 @@ const initial =
         map.versions[map.versions.length - 1]
       ) as TIMapArray);
 
+const urlHashString = document.location.hash.slice(1);
+
 const editor = new Editor({
-  initial,
+  initial:
+    urlHashString !== undefined
+      ? (TIMapArray.fromTTSString(urlHashString) as TIMapArray)
+      : initial,
   mapData: initVars.mapData,
   userData: initVars.userData,
 });

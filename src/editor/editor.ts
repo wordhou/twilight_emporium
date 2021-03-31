@@ -60,6 +60,7 @@ class Editor {
       selection: [],
       dropTarget: [],
     };
+    console.log(this.mapData);
     this.components = {
       editorControls: new EditorControls(this),
       tileSelector: new TileSelector(this),
@@ -81,10 +82,7 @@ class Editor {
     </div>
     `;
 
-    /*
-     */
     this.nodes = Component.attachComponentsToNodes(this.components, target);
-
     this._addEventListeners();
   }
 

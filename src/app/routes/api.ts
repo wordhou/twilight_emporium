@@ -37,6 +37,11 @@ api.post("/maps", requireAuth, async (req, res) => {
   res.json(map);
 });
 
+api.post("/maps/:id/copy", async (req, res) => {
+  const user_id = (req.user as User).user_id;
+  // TODO
+});
+
 api.get("/maps/:id", async (req, res) => {
   const map_id = parseInt(req.params.id);
   const map = await TwilightMap.get(map_id);
